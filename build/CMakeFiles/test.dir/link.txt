@@ -1,1 +1,0 @@
-/usr/bin/c++ CMakeFiles/test.dir/test.cpp.o CMakeFiles/test.dir/chess_board/chess_board.cpp.o -o test  chess_board/libchess_board.a 
