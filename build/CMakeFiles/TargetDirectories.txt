@@ -1,0 +1,6 @@
+/home/hminhdo/Desktop/coding-stuffs/chess-engine/build/CMakeFiles/test.dir
+/home/hminhdo/Desktop/coding-stuffs/chess-engine/build/CMakeFiles/edit_cache.dir
+/home/hminhdo/Desktop/coding-stuffs/chess-engine/build/CMakeFiles/rebuild_cache.dir
+/home/hminhdo/Desktop/coding-stuffs/chess-engine/build/chess_board/CMakeFiles/chess_board.dir
+/home/hminhdo/Desktop/coding-stuffs/chess-engine/build/chess_board/CMakeFiles/edit_cache.dir
+/home/hminhdo/Desktop/coding-stuffs/chess-engine/build/chess_board/CMakeFiles/rebuild_cache.dir
