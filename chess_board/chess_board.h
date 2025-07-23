@@ -6,10 +6,8 @@
 #include <functional>
 #include <string>
 #include <optional>
-#include <unordered_map>
-#include <utility>
 
-typedef std::pair<int, char> Coord2D;
+#include "coord2D.h"
 
 class ChessBoard {
     
@@ -18,66 +16,63 @@ public:
     ChessBoard();
 
     ChessBoard(
-        const std::string& board, 
-        bool whiteLeftRookMoved, 
-        bool whiteRightRookMoved,
-        bool whiteKingMoved,
-        bool blackLeftRookMoved, 
-        bool blackRightRookMoved,
-        bool blackKingMoved,
+        std::string  board,
+        bool whiteLeftCastling,
+        bool whiteRightCastling,
+        bool blackLeftCastling,
+        bool blackRightCastling,
         const std::optional<Coord2D>& whiteEnpassant, 
         const std::optional<Coord2D>& blackEnpassant
     );
 
-    inline std::string board() const {
+    [[nodiscard]] inline const std::string& board() const {
         return _board;
     }
     
-    inline bool whiteLeftCastling() const {
-        return !(_whiteKingMoved || _whiteLeftRookMoved);
+    [[nodiscard]] inline bool whiteLeftCastling() const {
+        return _whiteLeftCastling;
     }
 
-    inline bool blackLeftCastling() const {
-        return !(_blackKingMoved || _blackLeftRookMoved);
+    [[nodiscard]] inline bool blackLeftCastling() const {
+        return _blackLeftCastling;
     }
 
-    inline bool whiteRightCastling() const {
-        return !(_whiteKingMoved || _whiteRightRookMoved);
+    [[nodiscard]] inline bool whiteRightCastling() const {
+        return _whiteRightCastling;
     }
 
-    inline bool blackRightCastling() const {
-        return !(_whiteKingMoved || _blackRightRookMoved);
+    [[nodiscard]] inline bool blackRightCastling() const {
+        return _whiteRightCastling;
     }
 
-    inline const std::optional<Coord2D>& whiteEnpassant() const {
+    [[nodiscard]] inline const std::optional<Coord2D>& whiteEnpassant() const {
         return _whiteEnpassant;
     }
 
-    inline const std::optional<Coord2D>& blackEnpassant() const {
+    [[nodiscard]] inline const std::optional<Coord2D>& blackEnpassant() const {
         return _blackEnpassant;
     }
 
-    Piece_t getPiece(Coord2D coord);
-    bool operator==(const ChessBoard& other);
-    operator std::string();
+    Piece_t getPiece(Coord2D coord) const;
+    bool operator==(const ChessBoard& other) const;
+    std::string getWhitePOV();
+    std::string getBlackPOV();
+    static std::string initRawBoard();
 
 private:
     
-    static std::string initRawBoard();
-    static constexpr int BOARD_SIZE = 8;
+    static constexpr int8_t BOARD_SIZE = 8;
 
     // raw board representation
-    std::string _board;
+    const std::string _board;
 
     // specify whether the white player can perform castling
-    bool _whiteLeftRookMoved;
-    bool _whiteRightRookMoved;
-    bool _whiteKingMoved;
+    bool _whiteLeftCastling;
+    bool _whiteRightCastling;
 
     // specify whether the black player can perform castling
-    bool _blackLeftRookMoved;
-    bool _blackRightRookMoved;
-    bool _blackKingMoved;
+    bool _blackLeftCastling;
+    bool _blackRightCastling;
 
     // specify which pawn just performed a 2-square advance; said
     // pawn is susceptible to en passant 
@@ -89,7 +84,7 @@ private:
 template<>
 struct std::hash<ChessBoard> {
 
-    std::size_t operator()(const ChessBoard& board) {
+    std::size_t operator()(const ChessBoard& board) const noexcept {
         std::hash<std::string> rawBoardHasher;
         std::size_t hRawBoard = rawBoardHasher(board.board());
 

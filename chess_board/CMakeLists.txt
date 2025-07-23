@@ -6,8 +6,10 @@ target_sources(
         ${CMAKE_CURRENT_LIST_DIR}/chess_piece.h
         ${CMAKE_CURRENT_LIST_DIR}/chess_board.h 
         ${CMAKE_CURRENT_LIST_DIR}/chess_board.cpp
-        # ${CMAKE_CURRENT_LIST_DIR}/board_factory.cpp 
-        # ${CMAKE_CURRENT_LIST_DIR}/board_factory.h
+        ${CMAKE_CURRENT_LIST_DIR}/coord2D.h
+        ${CMAKE_CURRENT_LIST_DIR}/coord2D.cpp 
+        ${CMAKE_CURRENT_LIST_DIR}/move.h
+        ${CMAKE_CURRENT_LIST_DIR}/move.cpp 
 )
 
 target_include_directories(
