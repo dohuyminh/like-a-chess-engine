@@ -1,13 +1,15 @@
 #pragma once
 
+#include "coord2D.h"
 #include "chess_piece.h"
 
 #include <cstddef>
 #include <functional>
 #include <string>
 #include <optional>
+#include <unordered_set>
+#include <vector>
 
-#include "coord2D.h"
 
 class ChessBoard {
     
@@ -53,6 +55,8 @@ public:
         return _blackEnpassant;
     }
 
+    std::unordered_set<Coord2D> kingIsChecked(bool kingIsWhite);
+    
     Piece_t getPiece(Coord2D coord) const;
     bool operator==(const ChessBoard& other) const;
     std::string getWhitePOV();
@@ -61,6 +65,8 @@ public:
 
 private:
     
+    bool pieceCanCaptureKing(Coord2D pieceCoord);
+
     static constexpr int8_t BOARD_SIZE = 8;
 
     // raw board representation

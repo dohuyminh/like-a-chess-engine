@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <functional>
 #include <string>
 
 class Vec2D {
@@ -106,4 +107,10 @@ const Vec2D vecMap[8] = {
     Vec2D( 1, 1)  // DOWN RIGHT
 };
 
-
+template <>
+struct std::hash<Coord2D> {
+    std::size_t operator()(Coord2D coord) const noexcept {
+        std::size_t h1 = std::hash<int8_t>()(coord.row()), h2 = std::hash<char>()(coord.col());
+        return h1 << (h1 - h2);
+    }    
+};

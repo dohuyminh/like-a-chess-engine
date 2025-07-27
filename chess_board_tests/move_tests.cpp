@@ -213,24 +213,24 @@ TEST(CastlingTest, InvalidCastlingNoRight) {
 
 TEST(CastlingTest, ValidBlackLeftCastling) {
     std::string raw = ChessBoard::initRawBoard();
-    for (char col = 'B'; col < 'E'; ++col)
+    for (char col = 'F'; col < 'H'; ++col)
         raw[Coord2D(col, 8).toFlatIdx()] = static_cast<char>(ChessPiece::NONE);
     ChessBoard board(raw, true, true, true, true, std::nullopt, std::nullopt);
     Castling move(false, true);
     auto result = move(board);
     ASSERT_TRUE(result.has_value());
-    EXPECT_EQ(result->getPiece(Coord2D('C', 8)), static_cast<char>(ChessPiece::BLACK_KING));
-    EXPECT_EQ(result->getPiece(Coord2D('D', 8)), static_cast<char>(ChessPiece::BLACK_ROOK));
+    EXPECT_EQ(result->getPiece(Coord2D('G', 8)), static_cast<char>(ChessPiece::BLACK_KING));
+    EXPECT_EQ(result->getPiece(Coord2D('F', 8)), static_cast<char>(ChessPiece::BLACK_ROOK));
 }
 
 TEST(CastlingTest, ValidBlackRightCastling) {
     std::string raw = ChessBoard::initRawBoard();
-    for (char col = 'F'; col < 'H'; ++col)
+    for (char col = 'B'; col < 'E'; ++col)
         raw[Coord2D(col, 8).toFlatIdx()] = static_cast<char>(ChessPiece::NONE);
     ChessBoard board(raw, true, true, true, true, std::nullopt, std::nullopt);
     Castling move(false, false);
     auto result = move(board);
     ASSERT_TRUE(result.has_value());
-    EXPECT_EQ(result->getPiece(Coord2D('G', 8)), static_cast<char>(ChessPiece::BLACK_KING));
-    EXPECT_EQ(result->getPiece(Coord2D('F', 8)), static_cast<char>(ChessPiece::BLACK_ROOK));
+    EXPECT_EQ(result->getPiece(Coord2D('C', 8)), static_cast<char>(ChessPiece::BLACK_KING));
+    EXPECT_EQ(result->getPiece(Coord2D('D', 8)), static_cast<char>(ChessPiece::BLACK_ROOK));
 }

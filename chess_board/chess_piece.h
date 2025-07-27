@@ -18,6 +18,22 @@ enum class ChessPiece : char {
     BLACK_KING
 };
 
+constexpr char PieceToAscii[13][4] = {
+    " ", // NONE
+    "♙", // WHITE_PAWN
+    "♖", // WHITE_ROOK
+    "♘", // WHITE_KNIGHT
+    "♗", // WHITE_BISHOP
+    "♕", // WHITE_QUEEN
+    "♔", // WHITE_KING
+    "♟", // BLACK_PAWN
+    "♜", // BLACK_ROOK
+    "♞", // BLACK_KNIGHT
+    "♝", // BLACK_BISHOP
+    "♛", // BLACK_QUEEN
+    "♚"  // BLACK_KING
+};
+
 inline bool pieceIsWhite(Piece_t piece) {
     return static_cast<char>(ChessPiece::WHITE_PAWN) <= piece &&
             piece <= static_cast<char>(ChessPiece::WHITE_KING);
