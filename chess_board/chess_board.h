@@ -19,6 +19,8 @@ public:
 
     ChessBoard(
         std::string  board,
+        Coord2D whiteKingCoord,
+        Coord2D blackKingCoord,
         bool whiteLeftCastling,
         bool whiteRightCastling,
         bool blackLeftCastling,
@@ -44,7 +46,7 @@ public:
     }
 
     [[nodiscard]] inline bool blackRightCastling() const {
-        return _whiteRightCastling;
+        return _blackRightCastling;
     }
 
     [[nodiscard]] inline const std::optional<Coord2D>& whiteEnpassant() const {
@@ -55,6 +57,15 @@ public:
         return _blackEnpassant;
     }
 
+    [[nodiscard]] inline const Coord2D& whiteKingCoord() const {
+        return _whiteKingCoord;
+    }
+
+    [[nodiscard]] inline const Coord2D& blackKingCoord() const {
+        return _blackKingCoord;
+    }
+
+    bool isCheckmate(bool isWhite);
     std::unordered_set<Coord2D> kingIsChecked(bool kingIsWhite);
     
     Piece_t getPiece(Coord2D coord) const;
@@ -65,12 +76,16 @@ public:
 
 private:
     
-    bool pieceCanCaptureKing(Coord2D pieceCoord);
+    bool pieceCanReachSquare(Coord2D pieceCoord, Coord2D target) const;
 
     static constexpr int8_t BOARD_SIZE = 8;
 
     // raw board representation
     const std::string _board;
+
+    // specify the king's coordinates
+    Coord2D _whiteKingCoord;
+    Coord2D _blackKingCoord;
 
     // specify whether the white player can perform castling
     bool _whiteLeftCastling;

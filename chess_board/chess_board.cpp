@@ -41,12 +41,16 @@ ChessBoard::ChessBoard() :
     _blackLeftCastling(true),
     _blackRightCastling(true),
     _whiteEnpassant(std::nullopt),
-    _blackEnpassant(std::nullopt) {
+    _blackEnpassant(std::nullopt),
+    _whiteKingCoord('E', 1),
+    _blackKingCoord('E', 8) {
 
 }
 
 ChessBoard::ChessBoard(
         std::string board,
+        Coord2D whiteKingCoord,
+        Coord2D blackKingCoord,
         const bool whiteLeftCastling,
         const bool whiteRightCastling,
         const bool blackLeftCastling,
@@ -60,7 +64,9 @@ ChessBoard::ChessBoard(
     _blackLeftCastling(blackLeftCastling),
     _blackRightCastling(blackRightCastling),
     _whiteEnpassant(whiteEnpassant),
-    _blackEnpassant(blackEnpassant) {
+    _blackEnpassant(blackEnpassant),
+    _whiteKingCoord(std::move(whiteKingCoord)),
+    _blackKingCoord(std::move(blackKingCoord)) {
 
 }
 
@@ -99,6 +105,9 @@ std::unordered_set<Coord2D> ChessBoard::kingIsChecked(bool kingIsWhite) {
     // store all coordinates of pieces capturing the king 
     std::unordered_set<Coord2D> res;
 
+    // find the king's position
+    Coord2D kingCoord = kingIsWhite ? _whiteKingCoord : _blackKingCoord;
+
     // scan the board for all pieces of opposite color 
     for (char col = 'A'; col <= 'H'; ++col) {
         for (int8_t row = 1; row <= 8; ++row) {
@@ -113,7 +122,7 @@ std::unordered_set<Coord2D> ChessBoard::kingIsChecked(bool kingIsWhite) {
             
             // scan all the squares for all possible capture; 
             // found a king -> add to collection
-            if (pieceCanCaptureKing(coord)) {
+            if (pieceCanReachSquare(coord, kingCoord)) {
                 res.insert(coord);
             } 
         }
@@ -121,6 +130,64 @@ std::unordered_set<Coord2D> ChessBoard::kingIsChecked(bool kingIsWhite) {
 
     // no piece is checking the king; return false
     return res;
+}
+
+bool ChessBoard::isCheckmate(bool kingIsWhite) {
+    // if the king is not checked, it cannot be checkmate
+    std::unordered_set<Coord2D> checkedPieces = kingIsChecked(kingIsWhite);
+    if (checkedPieces.empty()) {
+        return false;
+    }
+
+    // if there is only 1 piece checking the king, see if it can be captured
+    if (checkedPieces.size() == 1) {
+        Coord2D checkingPieceCoord = *checkedPieces.begin();
+        for (char col = 'A'; col <= 'H'; ++col) {
+            for (int8_t row = 1; row <= 8; ++row) {
+                Coord2D pieceCoord(col, row);
+                Piece_t currPiece = getPiece(pieceCoord);
+                // if the piece is not of the same color, it can capture the checking piece
+                if (currPiece == static_cast<char>(ChessPiece::NONE) || (kingIsWhite == pieceIsWhite(currPiece))) {
+                    continue;
+                }
+
+                // if the piece can reach the checking piece, it can capture it
+                if (pieceCanReachSquare(pieceCoord, checkingPieceCoord)) {
+                    return false;
+                }
+            }
+        }
+    }
+
+    // if there are more, or the pieces cannot capture the checking piece,
+    // check if the king can move to a square that is not checked
+    Coord2D kingCoord = kingIsWhite ? _whiteKingCoord : _blackKingCoord;
+
+    // iterate through all possible moves
+    for (const Vec2D* mv = vecMap; mv < vecMap + 8; ++mv) {
+    
+        try {
+            Coord2D newKingCoord = kingCoord + *mv;
+            for (char col = 'A'; col <= 'H'; ++col) {
+                for (int8_t row = 1; row <= 8; ++row) {
+                    Coord2D iter = Coord2D(col, row);
+                    Piece_t currPiece = getPiece(iter);
+                    if (iter == newKingCoord || 
+                        currPiece == static_cast<char>(ChessPiece::NONE) || 
+                        kingIsWhite == pieceIsWhite(currPiece)) continue;
+                    
+                    if (kingIsChecked(kingIsWhite).empty()) return false;
+                }
+            }
+        } 
+        // move is invalid; ignore
+        catch (std::invalid_argument const&) {
+            continue;
+        }
+    }
+
+    // if all else, king is checkmated
+    return true;
 }
 
 std::string ChessBoard::getWhitePOV() {
@@ -175,12 +242,11 @@ std::string ChessBoard::getBlackPOV() {
     return rep;
 }
 
-bool ChessBoard::pieceCanCaptureKing(Coord2D pieceCoord) {
+bool ChessBoard::pieceCanReachSquare(Coord2D pieceCoord, Coord2D target) const {
     // get the current piece
     Piece_t piece = getPiece(pieceCoord);
     bool isWhite = pieceIsWhite(piece);
-    Piece_t target = isWhite ? static_cast<Piece_t>(ChessPiece::BLACK_KING) : static_cast<Piece_t>(ChessPiece::WHITE_KING);
-
+    
     bool isKnight = piece == static_cast<Piece_t>(ChessPiece::WHITE_KNIGHT) || piece == static_cast<Piece_t>(ChessPiece::BLACK_KNIGHT);
     bool isKing = piece == static_cast<Piece_t>(ChessPiece::WHITE_KING) || piece == static_cast<Piece_t>(ChessPiece::BLACK_KING);
 
@@ -200,7 +266,7 @@ bool ChessBoard::pieceCanCaptureKing(Coord2D pieceCoord) {
                 Vec2D mv(mvCols[mvColIdx], mvRows[mvRowIdx]);
                 try {
                     Coord2D place = pieceCoord + mv;
-                    if (getPiece(place) == target) {
+                    if (place == target) {
                         return true;
                     }
                 } catch (std::invalid_argument const& e) {
@@ -221,14 +287,14 @@ bool ChessBoard::pieceCanCaptureKing(Coord2D pieceCoord) {
         // check for left-side capture 
         bool left = (isWhite && pieceCoord.col() > 'A') || (!isWhite && pieceCoord.col() < 'H');
         Vec2D mvLeft = isWhite ? Vec2D(-1, 1) : Vec2D(1, -1);
-        if (left && getPiece(pieceCoord + mvLeft) == target) {
+        if (left && pieceCoord + mvLeft == target) {
             return true;
         }
         
         // check for right-side capture
         bool right = (isWhite && pieceCoord.col() < 'H') || (!isWhite && pieceCoord.col() > 'A');
         Vec2D mvRight = isWhite ? Vec2D(1, 1) : Vec2D(-1, -1);
-        if (right && getPiece(pieceCoord + mvRight) == target) {
+        if (right && pieceCoord + mvRight == target) {
             return true;
         }
     }
@@ -240,24 +306,24 @@ bool ChessBoard::pieceCanCaptureKing(Coord2D pieceCoord) {
         // horizontal movement
         for (char iterCol = pieceCoord.col() + 1; iterCol <= 'H'; ++iterCol) {
             Coord2D checkCoord = Coord2D(iterCol, pieceCoord.row());
-            if (getPiece(checkCoord) == target) return true; 
+            if (checkCoord == target) return true; 
             if (getPiece(checkCoord) != static_cast<char>(ChessPiece::NONE)) break; // stop if there is a piece
         }
         for (char iterCol = pieceCoord.col() - 1; iterCol >= 'A'; --iterCol) {
             Coord2D checkCoord = Coord2D(iterCol, pieceCoord.row());
-            if (getPiece(checkCoord) == target) return true;
+            if (checkCoord == target) return true;
             if (getPiece(checkCoord) != static_cast<char>(ChessPiece::NONE)) break; 
         }
 
         // vertical movement
         for (int8_t iterRow = pieceCoord.row() + 1; iterRow <= 8; ++iterRow) {
             Coord2D checkCoord = Coord2D(pieceCoord.col(), iterRow);
-            if (getPiece(checkCoord) == target) return true;
+            if (checkCoord == target) return true;
             if (getPiece(checkCoord) != static_cast<char>(ChessPiece::NONE)) break; 
         }
         for (int8_t iterRow = pieceCoord.row() - 1; iterRow >= 1; --iterRow) {
             Coord2D checkCoord = Coord2D(pieceCoord.col(), iterRow);
-            if (getPiece(checkCoord) == target) return true;
+            if (checkCoord == target) return true;
             if (getPiece(checkCoord) != static_cast<char>(ChessPiece::NONE)) break; 
         }
     }
@@ -269,7 +335,7 @@ bool ChessBoard::pieceCanCaptureKing(Coord2D pieceCoord) {
 
         while (iterCol <= 'H' && iterRow <= 8) {
             Coord2D checkCoord = Coord2D(iterCol, iterRow);
-            if (getPiece(checkCoord) == target) return true;
+            if (checkCoord == target) return true;
             if (getPiece(checkCoord) != static_cast<char>(ChessPiece::NONE)) break;
             ++iterCol, ++iterRow;
         }
@@ -278,7 +344,7 @@ bool ChessBoard::pieceCanCaptureKing(Coord2D pieceCoord) {
         iterRow = pieceCoord.row() - 1;
         while (iterCol <= 'H' && iterRow >= 1) {
             Coord2D checkCoord = Coord2D(iterCol, iterRow);
-            if (getPiece(checkCoord) == target) return true;
+            if (checkCoord == target) return true;
             if (getPiece(checkCoord) != static_cast<char>(ChessPiece::NONE)) break;
             ++iterCol, --iterRow;
         }
@@ -287,7 +353,7 @@ bool ChessBoard::pieceCanCaptureKing(Coord2D pieceCoord) {
         iterRow = pieceCoord.row() + 1;
         while (iterCol >= 'A' && iterRow <= 8) {
             Coord2D checkCoord = Coord2D(iterCol, iterRow);
-            if (getPiece(checkCoord) == target) return true;
+            if (checkCoord == target) return true;
             if (getPiece(checkCoord) != static_cast<char>(ChessPiece::NONE)) break;
             --iterCol, ++iterRow;   
         }
@@ -296,7 +362,7 @@ bool ChessBoard::pieceCanCaptureKing(Coord2D pieceCoord) {
         iterRow = pieceCoord.row() - 1;
         while (iterCol >= 'A' && iterRow >= 1) {
             Coord2D checkCoord = Coord2D(iterCol, iterRow);
-            if (getPiece(checkCoord) == target) return true;
+            if (checkCoord == target) return true;
             if (getPiece(checkCoord) != static_cast<char>(ChessPiece::NONE)) break;
             --iterCol, --iterRow;
         }

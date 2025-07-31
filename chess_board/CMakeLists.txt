@@ -6,6 +6,8 @@ target_sources(
         ${CMAKE_CURRENT_LIST_DIR}/chess_piece.h
         ${CMAKE_CURRENT_LIST_DIR}/chess_board.h 
         ${CMAKE_CURRENT_LIST_DIR}/chess_board.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/chess_board_check.h 
+        ${CMAKE_CURRENT_LIST_DIR}/chess_board_check.cpp
         ${CMAKE_CURRENT_LIST_DIR}/coord2D.h
         ${CMAKE_CURRENT_LIST_DIR}/coord2D.cpp 
         ${CMAKE_CURRENT_LIST_DIR}/move.h
