@@ -15,6 +15,7 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(googletest)
 
-add_subdirectory(lib_cpp/pybind11)
-add_subdirectory(chess_board)
+find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
+add_subdirectory(pybind11)
+add_subdirectory(chess_library_src)
 add_subdirectory(chess_board_tests)

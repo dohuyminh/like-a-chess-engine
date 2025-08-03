@@ -13,7 +13,7 @@ target_include_directories(
 
 target_link_libraries(
     unit_tests
-    chess_board
+    chess_library_src
     GTest::gtest_main
 )
 
