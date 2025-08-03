@@ -15,5 +15,6 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(googletest)
 
+add_subdirectory(lib_cpp/pybind11)
 add_subdirectory(chess_board)
 add_subdirectory(chess_board_tests)

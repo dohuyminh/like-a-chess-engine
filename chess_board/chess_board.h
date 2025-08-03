@@ -65,19 +65,14 @@ public:
         return _blackKingCoord;
     }
 
-    bool isCheckmate(bool isWhite);
-    std::unordered_set<Coord2D> kingIsChecked(bool kingIsWhite);
-    
     Piece_t getPiece(Coord2D coord) const;
     bool operator==(const ChessBoard& other) const;
     std::string getWhitePOV();
     std::string getBlackPOV();
-    static std::string initRawBoard();
-
+    
 private:
     
-    bool pieceCanReachSquare(Coord2D pieceCoord, Coord2D target) const;
-
+    static std::string initRawBoard();
     static constexpr int8_t BOARD_SIZE = 8;
 
     // raw board representation

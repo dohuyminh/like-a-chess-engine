@@ -9,7 +9,7 @@ protected:
 };
 
 TEST_F(MoveTest, QueensMoveWhiteRookValid) {
-    std::string rawBoard = ChessBoard::initRawBoard();
+    std::string rawBoard = board.board();
     rawBoard[Coord2D('A', 2).toFlatIdx()] = static_cast<char>(ChessPiece::NONE);
     rawBoard[Coord2D('H', 2).toFlatIdx()] = static_cast<char>(ChessPiece::NONE);
     ChessBoard custom(rawBoard, Coord2D('E', 1), Coord2D('E', 8), true, true, true, true, std::nullopt, std::nullopt);
@@ -39,7 +39,7 @@ TEST_F(MoveTest, QueensMoveWhiteRookValid) {
 }
 
 TEST_F(MoveTest, QueensMoveBlackRookValid) {
-    std::string rawBoard = ChessBoard::initRawBoard();
+    std::string rawBoard = board.board();
     rawBoard[Coord2D('A', 7).toFlatIdx()] = static_cast<char>(ChessPiece::NONE);
     rawBoard[Coord2D('H', 7).toFlatIdx()] = static_cast<char>(ChessPiece::NONE);
     ChessBoard custom(rawBoard, Coord2D('E', 1), Coord2D('E', 8), true, true, true, true, std::nullopt, std::nullopt);

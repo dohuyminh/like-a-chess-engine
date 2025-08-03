@@ -101,18 +101,18 @@ TEST_F(ChessBoardTest, IsCheckmateFalseOnInitial) {
 
 TEST_F(ChessBoardTest, IsCheckmateTrueSimple) {
     // Fool's mate
-    std::string b = ChessBoard::initRawBoard();
+    std::string b = board.board();
     b[Coord2D('F', 2).toFlatIdx()] = static_cast<char>(ChessPiece::NONE);
     b[Coord2D('G', 2).toFlatIdx()] = static_cast<char>(ChessPiece::NONE);
     b[Coord2D('E', 7).toFlatIdx()] = static_cast<char>(ChessPiece::NONE);
     b[Coord2D('D', 8).toFlatIdx()] = static_cast<char>(ChessPiece::NONE);
     b[Coord2D('H', 4).toFlatIdx()] = static_cast<char>(ChessPiece::BLACK_QUEEN);
     ChessBoard custom(b, Coord2D('E', 1), Coord2D('E', 8), true, true, true, true, std::nullopt, std::nullopt);
-    EXPECT_TRUE(CheckTerminal::isCheckmate(custom, true));
+    EXPECT_TRUE(CheckTerminal::isCheckmate(custom, true)) << custom.getWhitePOV();
 }
 
 TEST_F(ChessBoardTest, IsCheckmateFalseIfKingCanEscape) {
-    std::string b = ChessBoard::initRawBoard();
+    std::string b = board.board();
     b[Coord2D('E', 2).toFlatIdx()] = static_cast<char>(ChessPiece::NONE);
     b[Coord2D('E', 3).toFlatIdx()] = static_cast<char>(ChessPiece::BLACK_ROOK);
     ChessBoard custom(b, Coord2D('E', 1), Coord2D('E', 8), true, true, true, true, std::nullopt, std::nullopt);
