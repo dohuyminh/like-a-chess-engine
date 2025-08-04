@@ -76,7 +76,7 @@ QueensMove::QueensMove(const bool appliedPieceIsWhite, const Direction direction
  * @param state The current state to be transitioned
  * @return A new state if the transition is valid, or std::nullopt otherwise
  */
-std::optional<ChessBoard> QueensMove::operator()(const ChessBoard& state) {
+std::optional<ChessBoard> QueensMove::operator()(const ChessBoard& state) const {
     // locate the position of piece on board 
     const Piece_t piece = state.getPiece(_origin);
 
@@ -276,7 +276,7 @@ KnightsMove::KnightsMove(const bool appliedPieceIsWhite, const Vec2D direction, 
     }
 }
 
-std::optional<ChessBoard> KnightsMove::operator()(const ChessBoard& state) {
+std::optional<ChessBoard> KnightsMove::operator()(const ChessBoard& state) const {
     // locate the position of piece on board 
     const Piece_t piece = state.getPiece(_origin);
 
@@ -393,7 +393,7 @@ Underpromotion::Underpromotion(const bool appliedPieceIsWhite, const Direction d
     }
 }
 
-std::optional<ChessBoard> Underpromotion::operator()(const ChessBoard& state) {
+std::optional<ChessBoard> Underpromotion::operator()(const ChessBoard& state) const {
     // get the piece at origin 
     Piece_t piece = state.getPiece(_origin);
 
@@ -474,7 +474,7 @@ Castling::Castling(bool isWhiteTurn, bool isLeft) :
     ChessMove(isWhiteTurn), 
     _isLeft(isLeft) {}
 
-std::optional<ChessBoard> Castling::operator()(const ChessBoard& state) {
+std::optional<ChessBoard> Castling::operator()(const ChessBoard& state) const {
     // check if castling is allowed in the first place 
     if (_isWhite) {
         if ((_isLeft && !state.whiteLeftCastling()) || (!_isLeft && !state.whiteRightCastling())) {

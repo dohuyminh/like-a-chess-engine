@@ -70,7 +70,7 @@ public:
         return *this;
     }
 
-    inline uint8_t toFlatIdx() {
+    inline uint8_t toFlatIdx() const {
         return Coord2D::BOARD_SIZE * (_row - 1) + (_col - 'A');
     }
 
