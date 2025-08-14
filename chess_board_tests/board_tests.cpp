@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include "chess_board.h"
-#include "chess_board_check.h"
+#include "check_terminal/check.h"
+#include "check_terminal/checkmate.h"
 
 class ChessBoardTest : public ::testing::Test {
 protected:
@@ -95,8 +96,8 @@ TEST_F(ChessBoardTest, KingIsCheckedByKing) {
 }
 
 TEST_F(ChessBoardTest, IsCheckmateFalseOnInitial) {
-    EXPECT_FALSE(CheckTerminal::isCheckmate(board, true));
-    EXPECT_FALSE(CheckTerminal::isCheckmate(board, false));
+    EXPECT_EQ(CheckTerminal::isCheckmate(board, true), CheckTerminal::MateStatus::NONE);
+    EXPECT_EQ(CheckTerminal::isCheckmate(board, false), CheckTerminal::MateStatus::NONE);
 }
 
 TEST_F(ChessBoardTest, IsCheckmateTrueSimple) {
@@ -108,7 +109,7 @@ TEST_F(ChessBoardTest, IsCheckmateTrueSimple) {
     b[Coord2D('D', 8).toFlatIdx()] = static_cast<char>(ChessPiece::NONE);
     b[Coord2D('H', 4).toFlatIdx()] = static_cast<char>(ChessPiece::BLACK_QUEEN);
     ChessBoard custom(b, Coord2D('E', 1), Coord2D('E', 8), true, true, true, true, std::nullopt, std::nullopt);
-    EXPECT_TRUE(CheckTerminal::isCheckmate(custom, true)) << custom.getWhitePOV();
+    EXPECT_EQ(CheckTerminal::isCheckmate(custom, true), CheckTerminal::MateStatus::CHECKMATE) << custom.getWhitePOV();
 }
 
 TEST_F(ChessBoardTest, IsCheckmateFalseIfKingCanEscape) {
@@ -116,5 +117,5 @@ TEST_F(ChessBoardTest, IsCheckmateFalseIfKingCanEscape) {
     b[Coord2D('E', 2).toFlatIdx()] = static_cast<char>(ChessPiece::NONE);
     b[Coord2D('E', 3).toFlatIdx()] = static_cast<char>(ChessPiece::BLACK_ROOK);
     ChessBoard custom(b, Coord2D('E', 1), Coord2D('E', 8), true, true, true, true, std::nullopt, std::nullopt);
-    EXPECT_FALSE(CheckTerminal::isCheckmate(custom, true)) << custom.getWhitePOV();
+    EXPECT_EQ(CheckTerminal::isCheckmate(custom, true), CheckTerminal::MateStatus::CHECK) << custom.getWhitePOV();
 }

@@ -2,6 +2,8 @@
 
 #include <stdexcept>
 
+Coord2D::Coord2D() : _col('A'), _row(1) {}
+
 Coord2D::Coord2D(const char col, const int8_t row) : _row(row), _col(col) {
     if (!(1 <= row && row <= 8 && 'A' <= col && col <= 'H')) {
         throw std::invalid_argument("Coordinate must be initialized in form {<A-H>,<1-8>}");

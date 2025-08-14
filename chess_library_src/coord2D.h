@@ -42,6 +42,7 @@ private:
 
 class Coord2D {
 public:
+    Coord2D();
     Coord2D(char col, int8_t row);
     
     inline int8_t row() const {
@@ -104,7 +105,18 @@ const Vec2D vecMap[8] = {
     Vec2D(-1, 1), // UP LEFT
     Vec2D( 1, 1), // UP RIGHT
     Vec2D(-1,-1), // DOWN LEFT
-    Vec2D( 1, 1)  // DOWN RIGHT
+    Vec2D( 1,-1)  // DOWN RIGHT
+};
+
+const Vec2D knightsMoveVec[8] = {
+    Vec2D(-1, 2), // UP LEFT
+    Vec2D( 1, 2), // UP RIGHT
+    Vec2D(-1,-2), // DOWN LEFT
+    Vec2D( 1,-2), // DOWN RIGHT
+    Vec2D(-2, 1), // LEFT UP
+    Vec2D( 2, 1), // RIGHT UP
+    Vec2D(-2,-1), // LEFT DOWN
+    Vec2D( 2,-1)  // RIGHT DOWN
 };
 
 template <>

@@ -10,7 +10,11 @@
 #include <unordered_set>
 #include <vector>
 
-
+/**
+ * @brief A representation of the current chess board state. 
+ * 
+ * This class encodes the board state; this includes the position of each piece, en passant square, castling rights
+ */
 class ChessBoard {
     
 public:
@@ -67,8 +71,8 @@ public:
 
     Piece_t getPiece(Coord2D coord) const;
     bool operator==(const ChessBoard& other) const;
-    std::string getWhitePOV();
-    std::string getBlackPOV();
+    std::string getWhitePOV() const;
+    std::string getBlackPOV() const;
     
 private:
     
@@ -76,7 +80,7 @@ private:
     static constexpr int8_t BOARD_SIZE = 8;
 
     // raw board representation
-    const std::string _board;
+    std::string _board;
 
     // specify the king's coordinates
     Coord2D _whiteKingCoord;

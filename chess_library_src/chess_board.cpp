@@ -104,7 +104,7 @@ bool ChessBoard::operator==(const ChessBoard& other) const {
     return true;
 }
 
-std::string ChessBoard::getWhitePOV() {
+std::string ChessBoard::getWhitePOV() const {
     std::string rep{"  a b c d e f g h\n"};
     
     for (int8_t row = BOARD_SIZE - 1; row >= 0; --row) {
@@ -130,7 +130,7 @@ std::string ChessBoard::getWhitePOV() {
     return rep;
 }
 
-std::string ChessBoard::getBlackPOV() {
+std::string ChessBoard::getBlackPOV() const {
     std::string rep{"  h g f e d c b a\n"};
 
     for (int8_t row = 0; row < BOARD_SIZE; ++row) {

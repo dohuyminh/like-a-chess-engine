@@ -6,12 +6,30 @@ target_sources(
         ${CMAKE_CURRENT_LIST_DIR}/chess_piece.h
         ${CMAKE_CURRENT_LIST_DIR}/chess_board.h 
         ${CMAKE_CURRENT_LIST_DIR}/chess_board.cpp
-        ${CMAKE_CURRENT_LIST_DIR}/chess_board_check.h 
-        ${CMAKE_CURRENT_LIST_DIR}/chess_board_check.cpp
+        # ${CMAKE_CURRENT_LIST_DIR}/chess_board_check.h 
+        # ${CMAKE_CURRENT_LIST_DIR}/chess_board_check.cpp
         ${CMAKE_CURRENT_LIST_DIR}/coord2D.h
         ${CMAKE_CURRENT_LIST_DIR}/coord2D.cpp 
-        ${CMAKE_CURRENT_LIST_DIR}/move.h
-        ${CMAKE_CURRENT_LIST_DIR}/move.cpp 
+        # ${CMAKE_CURRENT_LIST_DIR}/move.h
+        # ${CMAKE_CURRENT_LIST_DIR}/move.cpp 
+        ${CMAKE_CURRENT_LIST_DIR}/moves/get_all_moves.h
+        ${CMAKE_CURRENT_LIST_DIR}/moves/get_all_moves.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/moves/chess_move.h
+        ${CMAKE_CURRENT_LIST_DIR}/moves/chess_move.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/moves/castling.h
+        ${CMAKE_CURRENT_LIST_DIR}/moves/castling.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/moves/underpromotion.h
+        ${CMAKE_CURRENT_LIST_DIR}/moves/underpromotion.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/moves/queens_move.h
+        ${CMAKE_CURRENT_LIST_DIR}/moves/queens_move.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/moves/knights_move.h
+        ${CMAKE_CURRENT_LIST_DIR}/moves/knights_move.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/moves/algebraic_notation.h
+        ${CMAKE_CURRENT_LIST_DIR}/moves/algebraic_notation.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/check_terminal/check.h
+        ${CMAKE_CURRENT_LIST_DIR}/check_terminal/check.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/check_terminal/checkmate.h
+        ${CMAKE_CURRENT_LIST_DIR}/check_terminal/checkmate.cpp
 )
 
 target_link_libraries(

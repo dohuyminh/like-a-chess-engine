@@ -1,5 +1,11 @@
 #include <gtest/gtest.h>
-#include "move.h"
+#include "moves/queens_move.h"
+#include "moves/knights_move.h"
+#include "moves/underpromotion.h"
+#include "moves/castling.h"
+#include "moves/get_all_moves.h"
+#include "check_terminal/check.h"
+#include "check_terminal/checkmate.h"
 
 class MoveTest : public ::testing::Test {
 protected:
@@ -258,4 +264,185 @@ TEST_F(MoveTest, EnPassantNotAvailable) {
     QueensMove move(false, Direction::UP_RIGHT, 1, Coord2D('D', 4));
     auto result = move(custom);
     EXPECT_FALSE(result.has_value());
+}
+
+// Helper: Count moves of a certain type
+template<typename T>
+int CountMoveType(const std::vector<std::shared_ptr<ChessMove>>& moves) {
+    int count = 0;
+    for (const auto& m : moves) {
+        if (dynamic_cast<T*>(m.get())) ++count;
+    }
+    return count;
+}
+
+TEST(GetAllMoves, InitialPositionWhite) {
+    ChessBoard board;
+    auto moves = getAllMoves(board, true, true);
+    // 20 moves: 16 pawn moves + 4 knight moves
+    EXPECT_EQ(moves.size(), 20);
+    EXPECT_EQ(CountMoveType<KnightsMove>(moves), 4);
+
+    // ensure all moves lead to a valid state
+    for (const auto& move : moves) {
+        auto newState = (*move)(board);
+        ASSERT_TRUE(newState.has_value());
+        EXPECT_TRUE(CheckTerminal::kingIsChecked(newState.value(), true).empty());
+    }
+}
+
+TEST(GetAllMoves, InitialPositionBlack) {
+    ChessBoard board;
+    auto moves = getAllMoves(board, false, true);
+    EXPECT_EQ(moves.size(), 20);
+    EXPECT_EQ(CountMoveType<KnightsMove>(moves), 4);
+
+    // ensure all moves lead to a valid state
+    for (const auto& move : moves) {
+        auto newState = (*move)(board);
+        ASSERT_TRUE(newState.has_value());
+        EXPECT_TRUE(CheckTerminal::kingIsChecked(newState.value(), true).empty());
+    }
+}
+
+TEST(GetAllMoves, EmptyBoard) {
+    ChessBoard board(
+        std::string(64, static_cast<char>(ChessPiece::NONE)),
+        Coord2D('E', 1), Coord2D('E', 8),
+        false, false, false, false, std::nullopt, std::nullopt
+    );
+    auto moves = getAllMoves(board, true, true);
+    EXPECT_EQ(moves.size(), 0);
+
+    // ensure all moves lead to a valid state
+    for (const auto& move : moves) {
+        auto newState = (*move)(board);
+        ASSERT_TRUE(newState.has_value());
+        EXPECT_TRUE(CheckTerminal::kingIsChecked(newState.value(), true).empty());
+    }
+}
+
+TEST(GetAllMoves, OnlyKing) {
+    ChessBoard board(
+        std::string(64, static_cast<char>(ChessPiece::NONE)),
+        Coord2D('E', 1), Coord2D('E', 8),
+        false, false, false, false, std::nullopt, std::nullopt
+    );
+    // Place white king at E1
+    std::string raw = board.board();
+    raw[Coord2D('E', 1).toFlatIdx()] = static_cast<char>(ChessPiece::WHITE_KING);
+    ChessBoard kingBoard(
+        raw, Coord2D('E', 1), Coord2D('E', 8),
+        false, false, false, false, std::nullopt, std::nullopt
+    );
+    auto moves = getAllMoves(kingBoard, true, true);
+    // King at E1 has 5 possible moves (D1, D2, E2, F1, F2) but only those on board
+    EXPECT_EQ(moves.size(), 5);
+    EXPECT_EQ(CountMoveType<QueensMove>(moves), 5);
+    
+    // ensure all moves lead to a valid state
+    for (const auto& move : moves) {
+        auto newState = (*move)(kingBoard);
+        ASSERT_TRUE(newState.has_value()) << board.getWhitePOV();
+        EXPECT_TRUE(CheckTerminal::kingIsChecked(newState.value(), true).empty());
+    }
+}
+
+TEST(GetAllMoves, PawnPromotionMoves) {
+    std::string raw(64, static_cast<char>(ChessPiece::NONE));
+    raw[Coord2D('A', 7).toFlatIdx()] = static_cast<char>(ChessPiece::WHITE_PAWN);
+    ChessBoard board(
+        raw, Coord2D('E', 1), Coord2D('E', 8),
+        false, false, false, false, std::nullopt, std::nullopt
+    );
+    auto moves = getAllMoves(board, true, false);
+    // Pawn at A7 can move to A8 (promotion), or capture at B8 if enemy present
+    EXPECT_GE(moves.size(), 1);
+
+    raw[Coord2D('B', 8).toFlatIdx()] = static_cast<char>(ChessPiece::BLACK_KNIGHT);
+    ChessBoard boardWithCapture(
+        raw, Coord2D('E', 1), Coord2D('E', 8),
+        false, false, false, false, std::nullopt, std::nullopt
+    );
+    auto captureMoves = getAllMoves(boardWithCapture, true, false);
+    // Now pawn can capture at B8
+    EXPECT_GE(captureMoves.size(), 2);
+}
+
+TEST(GetAllMoves, BlockedPawn) {
+    std::string raw(64, static_cast<char>(ChessPiece::NONE));
+    raw[Coord2D('A', 2).toFlatIdx()] = static_cast<char>(ChessPiece::WHITE_PAWN);
+    raw[Coord2D('A', 3).toFlatIdx()] = static_cast<char>(ChessPiece::BLACK_PAWN);
+    ChessBoard board(
+        raw, Coord2D('E', 1), Coord2D('E', 8),
+        false, false, false, false, std::nullopt, std::nullopt
+    );
+    auto moves = getAllMoves(board, true, false);
+    // Pawn is blocked, should have no moves
+    EXPECT_EQ(moves.size(), 0) << board.getWhitePOV();
+}
+
+TEST(GetAllMoves, PawnEnPassant) {
+    std::string raw(64, static_cast<char>(ChessPiece::NONE));
+    raw[Coord2D('E', 4).toFlatIdx()] = static_cast<char>(ChessPiece::WHITE_PAWN);
+    raw[Coord2D('D', 4).toFlatIdx()] = static_cast<char>(ChessPiece::BLACK_PAWN);
+    ChessBoard board(
+        raw, Coord2D('E', 1), Coord2D('E', 8),
+        false, false, false, false, std::nullopt, Coord2D('E', 3)
+    );
+    auto moves = getAllMoves(board, false, false);
+    // Pawn at E4 can capture en passant at D3
+    EXPECT_EQ(moves.size(), 2);
+    EXPECT_EQ(CountMoveType<QueensMove>(moves), 2);
+}
+
+TEST(GetAllMoves, KnightJumpOverPieces) {
+    std::string raw(64, static_cast<char>(ChessPiece::NONE));
+    raw[Coord2D('B', 1).toFlatIdx()] = static_cast<char>(ChessPiece::WHITE_KNIGHT);
+    raw[Coord2D('B', 2).toFlatIdx()] = static_cast<char>(ChessPiece::WHITE_PAWN);
+    raw[Coord2D('C', 3).toFlatIdx()] = static_cast<char>(ChessPiece::BLACK_PAWN);
+    ChessBoard board(
+        raw, Coord2D('E', 1), Coord2D('E', 8),
+        false, false, false, false, std::nullopt, std::nullopt
+    );
+    auto moves = getAllMoves(board, true, false);
+    // Knight at B1 should have 2 moves: A3, C3 (C3 is a capture)
+    EXPECT_EQ(moves.size(), 6) << board.getWhitePOV();
+    EXPECT_EQ(CountMoveType<KnightsMove>(moves), 3);
+}
+
+TEST(GetAllMoves, RookMoves) {
+    std::string raw(64, static_cast<char>(ChessPiece::NONE));
+    raw[Coord2D('D', 4).toFlatIdx()] = static_cast<char>(ChessPiece::WHITE_ROOK);
+    ChessBoard board(
+        raw, Coord2D('E', 1), Coord2D('E', 8),
+        false, false, false, false, std::nullopt, std::nullopt
+    );
+    auto moves = getAllMoves(board, true, false);
+    // Rook at D4 should have 14 moves (7 up, 7 down, 3 left, 4 right)
+    EXPECT_EQ(moves.size(), 14);
+}
+
+TEST(GetAllMoves, BishopMoves) {
+    std::string raw(64, static_cast<char>(ChessPiece::NONE));
+    raw[Coord2D('C', 1).toFlatIdx()] = static_cast<char>(ChessPiece::WHITE_BISHOP);
+    ChessBoard board(
+        raw, Coord2D('E', 1), Coord2D('E', 8),
+        false, false, false, false, std::nullopt, std::nullopt
+    );
+    auto moves = getAllMoves(board, true, false);
+    // Bishop at C1 should have 7 moves (diagonals)
+    EXPECT_EQ(moves.size(), 7);
+}
+
+TEST(GetAllMoves, QueenMoves) {
+    std::string raw(64, static_cast<char>(ChessPiece::NONE));
+    raw[Coord2D('D', 4).toFlatIdx()] = static_cast<char>(ChessPiece::WHITE_QUEEN);
+    ChessBoard board(
+        raw, Coord2D('E', 1), Coord2D('E', 8),
+        false, false, false, false, std::nullopt, std::nullopt
+    );
+    auto moves = getAllMoves(board, true, false);
+    // Queen at D4 should have 27 moves (rook + bishop moves)
+    EXPECT_EQ(moves.size(), 27);
 }

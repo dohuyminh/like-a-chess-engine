@@ -1,0 +1,35 @@
+#pragma once
+
+#include "chess_move.h"
+
+/**
+ * @brief A class representing an underpromotion move in chess.
+ * An underpromotion allows a pawn to be promoted to a piece other than a queen (i.e., rook, bishop, knight) when it reaches the last row.
+ * This transformation can be applied to either a white or black pawn, and makes pedantic checks to ensure the move is only applied 
+ * to a pawn at the second last row (i.e., row 7 for white, row 2 for black). Should the check fail, it throws an ```std::invalid_argument``` exception.
+ */
+class Underpromotion final : public ChessMove {
+public:
+    Underpromotion(bool appliedPieceIsWhite, Direction direction, Coord2D origin, ChessPiece promotePiece);
+
+    std::optional<ChessBoard> operator()(const ChessBoard& state) const override;
+
+    inline Coord2D origin() const {
+        return _origin;
+    }
+
+    inline Vec2D moveVec() const {
+        return vecMap[_direction] * (_isWhite ? 1 : -1);
+    }
+
+    inline ChessPiece promotePiece() const {
+        return _promotePiece;
+    }
+
+    ~Underpromotion() override = default;
+
+private:
+    Direction _direction;
+    Coord2D _origin;
+    ChessPiece _promotePiece;
+};
