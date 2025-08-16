@@ -38,11 +38,11 @@ std::optional<ChessBoard> Castling::operator()(const ChessBoard& state) const {
 
     // check which king and which rook is going to move
     int8_t row = (_isWhite) ? 1 : 8;
-    char rookCol = navigate ? 'A' : 'H';
+    char rookCol = navigate ? 'a' : 'h';
     Vec2D mv = navigate ? Vec2D(1, 0) : Vec2D(-1, 0);
     
     Coord2D rookPos = Coord2D(rookCol, row);
-    Coord2D kingPos = Coord2D('E', row);
+    Coord2D kingPos = Coord2D('e', row);
 
     // get raw board 
     std::string rawBoard = state.board();

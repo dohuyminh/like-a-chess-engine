@@ -2,8 +2,6 @@
 
 #include "../chess_board.h"
 
-typedef std::pair<std::string, ChessBoard> moveResult;
-
 /**
  * @brief Base class for all chess moves.
  * This class defines the interface for a chess move, which can be applied to a ChessBoard state.
@@ -26,6 +24,11 @@ protected:
         
 public:
     ChessMove(bool appliedPieceIsWhite);
+
+    inline bool whiteMakesMove() {
+        return _isWhite;
+    }
+
     virtual std::optional<ChessBoard> operator()(const ChessBoard& state) const = 0;
     virtual ~ChessMove() = default;
 };

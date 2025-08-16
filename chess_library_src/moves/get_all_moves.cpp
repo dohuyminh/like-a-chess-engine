@@ -19,7 +19,7 @@ std::vector<std::shared_ptr<ChessMove>> getAllMoves(
     std::vector<std::shared_ptr<ChessMove>> moves;
 
     // iterate all pieces on the board
-    for (char col = 'A'; col <= 'H'; ++col) {
+    for (char col = 'a'; col <= 'h'; ++col) {
         for (int8_t row = 1; row <= 8; ++row) {
         
             Coord2D pieceCoord(col, row);
@@ -51,7 +51,6 @@ std::vector<std::shared_ptr<ChessMove>> getAllMoves(
     return moves;
 }
 
-#include <iostream>
 static void insertAllPossibleMoves(const ChessBoard& board, Coord2D pieceCoord, bool isWhiteTurn, std::vector<std::shared_ptr<ChessMove>>& moves) {
     Piece_t piece = board.getPiece(pieceCoord);
     if (piece == static_cast<char>(ChessPiece::NONE)) {
@@ -79,14 +78,14 @@ static void insertAllPossibleMoves(const ChessBoard& board, Coord2D pieceCoord, 
         // check for diagonal move (either by capturing another piece or en passant)
         // left diagonal
         Vec2D left = (isWhiteTurn) ? Vec2D(-1, 1) : Vec2D(1, -1);
-        bool canMoveLeft = (isWhiteTurn && pieceCoord.col() > 'A') || (!isWhiteTurn && pieceCoord.col() < 'H');
+        bool canMoveLeft = (isWhiteTurn && pieceCoord.col() > 'a') || (!isWhiteTurn && pieceCoord.col() < 'h');
         if (canMoveLeft && CheckTerminal::__pieceCanReachSquare(board, pieceCoord, pieceCoord + left)) {
             moves.push_back(std::make_shared<QueensMove>(QueensMove(isWhiteTurn, Direction::UP_LEFT, 1, pieceCoord)));
         }
 
         // right diagonal
         Vec2D right = (isWhiteTurn) ? Vec2D(1, 1) : Vec2D(-1, -1);
-        bool canMoveRight = (isWhiteTurn && pieceCoord.col() < 'H') || (!isWhiteTurn && pieceCoord.col() > 'A');
+        bool canMoveRight = (isWhiteTurn && pieceCoord.col() < 'h') || (!isWhiteTurn && pieceCoord.col() > 'a');
         if (canMoveRight && CheckTerminal::__pieceCanReachSquare(board, pieceCoord, pieceCoord + right)) {
             moves.push_back(std::make_shared<QueensMove>(QueensMove(isWhiteTurn, Direction::UP_RIGHT, 1, pieceCoord)));
         }
@@ -104,7 +103,6 @@ static void insertAllPossibleMoves(const ChessBoard& board, Coord2D pieceCoord, 
                 if (pieceAtDest == static_cast<Piece_t>(ChessPiece::NONE) || 
                     isWhiteTurn != pieceIsWhite(pieceAtDest)) {
                 
-                    std::cout << "Inserting vector move: " << (std::string)mvs[mvIdx] << " for piece at " << (std::string)pieceCoord << std::endl;
                     std::shared_ptr<ChessMove> move;
                     if (isKnight) {
                         move = std::make_shared<KnightsMove>(KnightsMove(isWhiteTurn, mvs[mvIdx], pieceCoord));
@@ -133,7 +131,7 @@ static void insertAllPossibleMoves(const ChessBoard& board, Coord2D pieceCoord, 
             for (int8_t i = 0; i < 4; ++i) {
                 char   currCol = pieceCoord.col() + vecMap[vecs[i]].mvCol() * nSteps * (isWhiteTurn ? 1 : -1);
                 int8_t currRow = pieceCoord.row() + vecMap[vecs[i]].mvRow() * nSteps * (isWhiteTurn ? 1 : -1); 
-                iterCheck[i] = 'A' <= currCol && currCol <= 'H' && 1 <= currRow && currRow <= 8;
+                iterCheck[i] = 'a' <= currCol && currCol <= 'h' && 1 <= currRow && currRow <= 8;
                 if (iterCheck[i]) {
                     Coord2D curr(currCol, currRow);
                     Piece_t currPiece = board.getPiece(curr);
@@ -166,7 +164,7 @@ static void insertAllPossibleMoves(const ChessBoard& board, Coord2D pieceCoord, 
             for (int8_t i = 0; i < 4; ++i) {
                 char   currCol = pieceCoord.col() + vecMap[vecs[i]].mvCol() * nSteps * (isWhiteTurn ? 1 : -1);
                 int8_t currRow = pieceCoord.row() + vecMap[vecs[i]].mvRow() * nSteps * (isWhiteTurn ? 1 : -1); 
-                iterCheck[i] = 'A' <= currCol && currCol <= 'H' && 1 <= currRow && currRow <= 8;
+                iterCheck[i] = 'a' <= currCol && currCol <= 'h' && 1 <= currRow && currRow <= 8;
                 if (iterCheck[i]) {
                     Coord2D curr(currCol, currRow);
                     Piece_t currPiece = board.getPiece(curr);

@@ -150,12 +150,12 @@ std::optional<ChessBoard> QueensMove::operator()(const ChessBoard& state) const 
         
         // rook's move may forfeit castling rights 
         if (_isWhite) {
-            if (newWhiteLeftCastling && _origin == Coord2D('A', 1)) newWhiteLeftCastling = false;
-            else if (newWhiteRightCastling &&  _origin == Coord2D('H', 1)) newWhiteRightCastling = false;
+            if (newWhiteLeftCastling && _origin == Coord2D('a', 1)) newWhiteLeftCastling = false;
+            else if (newWhiteRightCastling &&  _origin == Coord2D('h', 1)) newWhiteRightCastling = false;
         }
         else {
-            if (newBlackLeftCastling && _origin == Coord2D('H', 8)) newBlackLeftCastling = false;
-            else if (newBlackRightCastling && _origin == Coord2D('A', 8)) newBlackRightCastling = false;
+            if (newBlackLeftCastling && _origin == Coord2D('h', 8)) newBlackLeftCastling = false;
+            else if (newBlackRightCastling && _origin == Coord2D('a', 8)) newBlackRightCastling = false;
         }
     }
 

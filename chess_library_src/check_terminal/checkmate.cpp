@@ -3,6 +3,7 @@
 #include "../moves/queens_move.h"
 
 #include <stdexcept>
+#include <iostream>
 
 namespace CheckTerminal {
     MateStatus isCheckmate(const ChessBoard& board, bool kingIsWhite) {
@@ -20,7 +21,7 @@ namespace CheckTerminal {
             Coord2D checkingPieceCoord = *checkedPieces.begin();
             
             // check if the piece checking the king can be captured
-            for (char col = 'A'; col <= 'H'; ++col) {
+            for (char col = 'a'; col <= 'h'; ++col) {
                 for (int8_t row = 1; row <= 8; ++row) {
                     Coord2D pieceCoord(col, row);
                     Piece_t currPiece = board.getPiece(pieceCoord);
@@ -51,7 +52,7 @@ namespace CheckTerminal {
             
                 // iterate blockable squares
                 for (Coord2D blockableSquare = kingCoord + direction; blockableSquare != checkingPieceCoord; blockableSquare += direction) {
-                    for (char col = 'A'; col <= 'H'; ++col) {
+                    for (char col = 'a'; col <= 'h'; ++col) {
                         for (int8_t row = 1; row <= 8; ++row) {
                             Coord2D pieceCoord(col, row);
                             Piece_t currPiece = board.getPiece(pieceCoord);

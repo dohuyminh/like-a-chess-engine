@@ -25,19 +25,19 @@ void ChessMove::updateCastling(
     if (originPieceIsWhite) {
         // if the rook is at the original place and castling right still exists
         // capture it and castling right is forfeit
-        if (state.blackLeftCastling() && newPoint == Coord2D('H', 8)) {
+        if (state.blackLeftCastling() && newPoint == Coord2D('h', 8)) {
             newBlackLeftCastling = false; 
         } 
-        else if (state.blackRightCastling() && newPoint == Coord2D('A', 8)) {
+        else if (state.blackRightCastling() && newPoint == Coord2D('a', 8)) {
             newBlackRightCastling = false;
         }
     }   
     else {
         // same logic applies
-        if (state.whiteLeftCastling() && newPoint == Coord2D('A', 1)) {
+        if (state.whiteLeftCastling() && newPoint == Coord2D('a', 1)) {
             newWhiteLeftCastling = false; 
         } 
-        else if (state.whiteRightCastling() && newPoint == Coord2D('H', 1)) {
+        else if (state.whiteRightCastling() && newPoint == Coord2D('h', 1)) {
             newWhiteRightCastling = false;
         }
     }

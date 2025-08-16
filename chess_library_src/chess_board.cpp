@@ -46,8 +46,8 @@ ChessBoard::ChessBoard() :
     _blackRightCastling(true),
     _whiteEnpassant(std::nullopt),
     _blackEnpassant(std::nullopt),
-    _whiteKingCoord('E', 1),
-    _blackKingCoord('E', 8) {
+    _whiteKingCoord('e', 1),
+    _blackKingCoord('e', 8) {
 
 }
 
@@ -76,8 +76,8 @@ ChessBoard::ChessBoard(
 
 Piece_t ChessBoard::getPiece(Coord2D coord) const {
     
-    if (!(coord.row() >= 1 && coord.row() <= 8) && (coord.col() >= 'A' && coord.col() <= 'H')) {
-        throw std::out_of_range("Position on the board must be <1-8, A-H>");
+    if (!(coord.row() >= 1 && coord.row() <= 8) && (coord.col() >= 'a' && coord.col() <= 'h')) {
+        throw std::out_of_range("Position on the board must be <a-h><1-8>");
     }
 
     int idx = coord.toFlatIdx(); 

@@ -15,7 +15,7 @@ namespace CheckTerminal
         Coord2D kingCoord = kingIsWhite ? board.whiteKingCoord() : board.blackKingCoord();
 
         // scan the board for all pieces of opposite color 
-        for (char col = 'A'; col <= 'H'; ++col) {
+        for (char col = 'a'; col <= 'h'; ++col) {
             for (int8_t row = 1; row <= 8; ++row) {
                 
                 Coord2D coord(col, row);
@@ -44,9 +44,9 @@ namespace CheckTerminal
     }
 } // namespace CheckTerminal
 
-
 static bool pieceCanReachSquare(const ChessBoard& board, Coord2D pieceCoord, Coord2D target) {
-// get the current piece
+    
+    // get the current piece
     Piece_t piece = board.getPiece(pieceCoord);
     bool isWhite = pieceIsWhite(piece);
     
@@ -84,7 +84,7 @@ static bool pieceCanReachSquare(const ChessBoard& board, Coord2D pieceCoord, Coo
         }
         
         // check for left-side capture 
-        bool left = (isWhite && pieceCoord.col() > 'A') || (!isWhite && pieceCoord.col() < 'H');
+        bool left = (isWhite && pieceCoord.col() > 'a') || (!isWhite && pieceCoord.col() < 'h');
         Vec2D mvLeft = isWhite ? Vec2D(-1, 1) : Vec2D(1, -1);
         if (left && pieceCoord + mvLeft == target) {
             Coord2D targetSquare = pieceCoord + mvLeft;
@@ -97,7 +97,7 @@ static bool pieceCanReachSquare(const ChessBoard& board, Coord2D pieceCoord, Coo
         }
         
         // check for right-side capture
-        bool right = (isWhite && pieceCoord.col() < 'H') || (!isWhite && pieceCoord.col() > 'A');
+        bool right = (isWhite && pieceCoord.col() < 'h') || (!isWhite && pieceCoord.col() > 'a');
         Vec2D mvRight = isWhite ? Vec2D(1, 1) : Vec2D(-1, -1);
         if (right && pieceCoord + mvRight == target) {
             Coord2D targetSquare = pieceCoord + mvRight;
@@ -127,12 +127,12 @@ static bool pieceCanReachSquare(const ChessBoard& board, Coord2D pieceCoord, Coo
     bool isRook = piece == static_cast<Piece_t>(ChessPiece::WHITE_ROOK) || piece == static_cast<Piece_t>(ChessPiece::BLACK_ROOK); 
     if (isQueen || isRook) {
         // horizontal movement
-        for (char iterCol = pieceCoord.col() + 1; iterCol <= 'H'; ++iterCol) {
+        for (char iterCol = pieceCoord.col() + 1; iterCol <= 'h'; ++iterCol) {
             Coord2D checkCoord = Coord2D(iterCol, pieceCoord.row());
             if (checkCoord == target) return true; 
             if (board.getPiece(checkCoord) != static_cast<char>(ChessPiece::NONE)) break; // stop if there is a piece
         }
-        for (char iterCol = pieceCoord.col() - 1; iterCol >= 'A'; --iterCol) {
+        for (char iterCol = pieceCoord.col() - 1; iterCol >= 'a'; --iterCol) {
             Coord2D checkCoord = Coord2D(iterCol, pieceCoord.row());
             if (checkCoord == target) return true;
             if (board.getPiece(checkCoord) != static_cast<char>(ChessPiece::NONE)) break; 
@@ -156,7 +156,7 @@ static bool pieceCanReachSquare(const ChessBoard& board, Coord2D pieceCoord, Coo
         char iterCol = pieceCoord.col() + 1;
         int8_t iterRow = pieceCoord.row() + 1;
 
-        while (iterCol <= 'H' && iterRow <= 8) {
+        while (iterCol <= 'h' && iterRow <= 8) {
             Coord2D checkCoord = Coord2D(iterCol, iterRow);
             if (checkCoord == target) return true;
             if (board.getPiece(checkCoord) != static_cast<char>(ChessPiece::NONE)) break;
@@ -165,7 +165,7 @@ static bool pieceCanReachSquare(const ChessBoard& board, Coord2D pieceCoord, Coo
         
         iterCol = pieceCoord.col() + 1;
         iterRow = pieceCoord.row() - 1;
-        while (iterCol <= 'H' && iterRow >= 1) {
+        while (iterCol <= 'h' && iterRow >= 1) {
             Coord2D checkCoord = Coord2D(iterCol, iterRow);
             if (checkCoord == target) return true;
             if (board.getPiece(checkCoord) != static_cast<char>(ChessPiece::NONE)) break;
@@ -174,7 +174,7 @@ static bool pieceCanReachSquare(const ChessBoard& board, Coord2D pieceCoord, Coo
 
         iterCol = pieceCoord.col() - 1;
         iterRow = pieceCoord.row() + 1;
-        while (iterCol >= 'A' && iterRow <= 8) {
+        while (iterCol >= 'a' && iterRow <= 8) {
             Coord2D checkCoord = Coord2D(iterCol, iterRow);
             if (checkCoord == target) return true;
             if (board.getPiece(checkCoord) != static_cast<char>(ChessPiece::NONE)) break;
@@ -183,7 +183,7 @@ static bool pieceCanReachSquare(const ChessBoard& board, Coord2D pieceCoord, Coo
 
         iterCol = pieceCoord.col() - 1;
         iterRow = pieceCoord.row() - 1;
-        while (iterCol >= 'A' && iterRow >= 1) {
+        while (iterCol >= 'a' && iterRow >= 1) {
             Coord2D checkCoord = Coord2D(iterCol, iterRow);
             if (checkCoord == target) return true;
             if (board.getPiece(checkCoord) != static_cast<char>(ChessPiece::NONE)) break;

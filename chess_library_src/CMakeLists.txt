@@ -38,10 +38,10 @@ target_link_libraries(
         pybind11::module
 )
 
-# pybind11_add_module(
-#     chess_board
-#         ${CMAKE_CURRENT_LIST_DIR}/chess_board.cpp
-# )
+pybind11_add_module(
+    chess_board
+        ${CMAKE_CURRENT_LIST_DIR}/chess_board.cpp
+)
 
 target_include_directories(
     chess_library_src

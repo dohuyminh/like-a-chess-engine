@@ -30,12 +30,12 @@ Underpromotion::Underpromotion(const bool appliedPieceIsWhite, const Direction d
     // check if pieces at the edge are trying to go out of bound 
     if (
         (_isWhite && (
-            (_origin == Coord2D('A', 7) && _direction == Direction::UP_LEFT) || 
-            (_origin == Coord2D('H', 7) && _direction == Direction::UP_RIGHT)
+            (_origin == Coord2D('a', 7) && _direction == Direction::UP_LEFT) || 
+            (_origin == Coord2D('h', 7) && _direction == Direction::UP_RIGHT)
         )) || 
         (!_isWhite && (
-            (_origin == Coord2D('A', 2) && _direction == Direction::UP_RIGHT) ||
-            (_origin == Coord2D('H', 2) && _direction == Direction::UP_LEFT)
+            (_origin == Coord2D('a', 2) && _direction == Direction::UP_RIGHT) ||
+            (_origin == Coord2D('h', 2) && _direction == Direction::UP_LEFT)
         ))
     ) {
         throw std::invalid_argument("Pawn's move results in out-of-bound coordinate");

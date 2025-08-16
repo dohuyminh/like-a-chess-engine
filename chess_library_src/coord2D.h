@@ -6,7 +6,7 @@
 
 class Vec2D {
 public:
-    Vec2D(int8_t mvCol, int8_t mvRow);
+    Vec2D(int8_t mvCol, int8_t mvRow) noexcept;
 
     inline int8_t mvRow() const {
         return _mvRow;
@@ -42,22 +42,22 @@ private:
 
 class Coord2D {
 public:
-    Coord2D();
+    Coord2D() noexcept;
     Coord2D(char col, int8_t row);
     
-    inline int8_t row() const {
+    inline int8_t row() const noexcept {
         return _row;
     }
 
-    inline char col() const {
+    inline char col() const noexcept {
         return _col;
     }
 
-    inline friend bool operator==(Coord2D first, Coord2D second) {
+    inline friend bool operator==(Coord2D first, Coord2D second) noexcept {
         return first._row == second._row && first._col == second._col;
     }
 
-    inline friend bool operator!=(Coord2D first, Coord2D second) {
+    inline friend bool operator!=(Coord2D first, Coord2D second) noexcept {
         return !(first._row == second._row && first._col == second._col);
     }
 
@@ -65,14 +65,14 @@ public:
         return Coord2D(point._col + direction.mvCol(), point._row + direction.mvRow());
     }
 
-    inline Coord2D& operator+=(Vec2D mv) {
+    inline Coord2D& operator+=(Vec2D mv) noexcept {
         this->_row += mv.mvRow();
         this->_col += mv.mvCol();
         return *this;
     }
 
-    inline uint8_t toFlatIdx() const {
-        return Coord2D::BOARD_SIZE * (_row - 1) + (_col - 'A');
+    inline uint8_t toFlatIdx() const noexcept {
+        return Coord2D::BOARD_SIZE * (_row - 1) + (_col - 'a');
     }
 
     operator std::string();
