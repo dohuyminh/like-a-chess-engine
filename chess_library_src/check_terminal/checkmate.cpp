@@ -1,6 +1,9 @@
 #include "checkmate.h"
 #include "check.h"
+#include "../moves/get_all_moves.h"
 #include "../moves/queens_move.h"
+#include "../moves/knights_move.h"
+#include "../moves/underpromotion.h"
 
 #include <stdexcept>
 #include <iostream>
@@ -8,67 +11,76 @@
 namespace CheckTerminal {
     MateStatus isCheckmate(const ChessBoard& board, bool kingIsWhite) {
         // if the king is not checked, it cannot be checkmate
-        std::unordered_set<Coord2D> checkedPieces = kingIsChecked(board, kingIsWhite);
-        if (checkedPieces.empty()) {
+        std::unordered_set<Coord2D> checkingPieces = kingIsChecked(board, kingIsWhite);
+        if (checkingPieces.empty()) {
             return MateStatus::NONE;
         }
 
         Coord2D kingCoord = kingIsWhite ? board.whiteKingCoord() : board.blackKingCoord();
-
+        
+        
         // if there is only 1 piece checking the king, see if it can be captured or blocked 
-        if (checkedPieces.size() == 1) {
+        if (checkingPieces.size() == 1) {
             
-            Coord2D checkingPieceCoord = *checkedPieces.begin();
+            Coord2D checkingPieceCoord = *checkingPieces.begin();
+            Piece_t checkingPiece = board.getPiece(checkingPieceCoord);
             
-            // check if the piece checking the king can be captured
-            for (char col = 'a'; col <= 'h'; ++col) {
-                for (int8_t row = 1; row <= 8; ++row) {
-                    Coord2D pieceCoord(col, row);
-                    Piece_t currPiece = board.getPiece(pieceCoord);
-                    // if the piece is not of the same color, it can capture the checking piece
-                    if (currPiece == static_cast<char>(ChessPiece::NONE) || (kingIsWhite != pieceIsWhite(currPiece))) {
-                        continue;
-                    }
+            // get the squares a piece can get into to block/capture the checking piece
+            std::unordered_set<Coord2D> captureBlockSet;
+            captureBlockSet.insert(checkingPieceCoord);
 
-                    // if the piece can reach the checking piece, it can capture it
-                    if (__pieceCanReachSquare(board, pieceCoord, checkingPieceCoord)) {
-                        return MateStatus::CHECK;
-                    }
-                }
-            }
+            // if it's a knight checking the king, it may only be captured
+            // otherwise blocking is possible
+            if (checkingPiece != static_cast<Piece_t>(ChessPiece::BLACK_KNIGHT) && 
+                checkingPiece != static_cast<Piece_t>(ChessPiece::WHITE_KNIGHT)) {
 
-            // check if the piece checking the king can be blocked
-            // if the piece is a knight, it cannot be blocked
-            if (board.getPiece(checkingPieceCoord) != static_cast<char>(ChessPiece::BLACK_KNIGHT) && 
-                board.getPiece(checkingPieceCoord) != static_cast<char>(ChessPiece::WHITE_KNIGHT)) {
-                
+                // decompose the vector of which the piece is checking the king 
                 // find all the squares between the king and the checking piece
-                int8_t deltaCol = (int8_t)checkingPieceCoord.col() - (int8_t)kingCoord.col(), 
-                        deltaRow = checkingPieceCoord.row() - kingCoord.row();
+                int8_t dx = (int8_t)checkingPieceCoord.col() - (int8_t)kingCoord.col(), 
+                       dy = checkingPieceCoord.row() - kingCoord.row();
 
                 // either the king is checked horizontally/vertically/diagonally
-                int8_t mag = std::max(std::abs(deltaCol), std::abs(deltaRow));
-                Vec2D direction = Vec2D(deltaCol / mag, deltaRow / mag);
-            
-                // iterate blockable squares
-                for (Coord2D blockableSquare = kingCoord + direction; blockableSquare != checkingPieceCoord; blockableSquare += direction) {
-                    for (char col = 'a'; col <= 'h'; ++col) {
-                        for (int8_t row = 1; row <= 8; ++row) {
-                            Coord2D pieceCoord(col, row);
-                            Piece_t currPiece = board.getPiece(pieceCoord);
-                            // if the piece is not of the same color, it can block the checking piece
-                            // for now, the king's movement is not considered 
-                            if (pieceCoord == kingCoord || 
-                                currPiece == static_cast<char>(ChessPiece::NONE) || 
-                                (kingIsWhite != pieceIsWhite(currPiece))) {
-                                continue;
-                            }
+                int8_t mag = std::max(std::abs(dx), std::abs(dy));
+                Vec2D direction = Vec2D(dx / mag, dy / mag);
+                
+                // iterate through blockable squares
+                for (int m = 1; m < mag; ++m) {
+                    captureBlockSet.insert(kingCoord + direction * m);
+                }
+            } 
 
-                            // if the piece can reach the blockable square, it can block the checking piece
-                            if (__pieceCanReachSquare(board, pieceCoord, blockableSquare)) {
-                                return MateStatus::CHECK;
-                            }
-                        }
+            // get all the moves; whichever leads to the capture/blocking of the checking piece 
+            // we also check if in the next state, the king is still in check or not
+            std::vector<std::shared_ptr<ChessMove>> mvs = getAllMoves(board, kingIsWhite);
+            for (const auto& mv: mvs) {
+
+                // is the current move performed by the king piece?
+                bool moveOnKing = false;
+                
+                // the piece's position after move 
+                Coord2D postMove;
+                
+                // this is technically sound since castling is impossible if the king is in check
+                if (std::dynamic_pointer_cast<QueensMove>(mv)) {
+                    auto cast = std::dynamic_pointer_cast<QueensMove>(mv);
+                    postMove = cast->origin() + cast->moveVec();
+                    moveOnKing = board.whiteKingCoord() == cast->origin();
+                } 
+                else if (std::dynamic_pointer_cast<KnightsMove>(mv)) {
+                    auto cast = std::dynamic_pointer_cast<KnightsMove>(mv);
+                    postMove = cast->origin() + cast->moveVec();
+                } 
+                else {
+                    auto cast = std::dynamic_pointer_cast<Underpromotion>(mv);
+                    postMove = cast->origin() + cast->moveVec();
+                }
+                
+                // if the move blocks/captures the checking piece, check if in the next state
+                // the king is out of check
+                if ((!moveOnKing && captureBlockSet.count(postMove)) || (moveOnKing && postMove == checkingPieceCoord)) {
+                    std::optional<ChessBoard> nextState = (*mv)(board);
+                    if (kingIsChecked(nextState.value(), kingIsWhite).empty()) {
+                        return MateStatus::CHECK;
                     }
                 }
             }

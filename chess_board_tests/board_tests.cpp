@@ -38,28 +38,9 @@ TEST_F(ChessBoardTest, GetPieceInvalidThrows) {
 TEST_F(ChessBoardTest, KingIsCheckedNone) {
     std::unordered_set<Coord2D> whiteKingCheck = CheckTerminal::kingIsChecked(board, true), 
                                 blackKingCheck = CheckTerminal::kingIsChecked(board, false);
-    
-    auto errMsg = [&](bool whiteKing) {
-        std::string err;
-        whiteKing ? err += board.getWhitePOV() : err += board.getBlackPOV();
-        if (whiteKing) {
-            err += "Pieces mistakenly checking white king:\n";
-            for (Coord2D c: whiteKingCheck) {
-                err += (std::string)c;
-                err.push_back('\n');
-            }
-        } else {
-            err += "Pieces mistakenly checking black king:\n";
-            for (Coord2D c: blackKingCheck) {
-                err += (std::string)c;
-                err.push_back('\n');
-            }
-        }
-        return err; 
-    };
 
-    EXPECT_TRUE(whiteKingCheck.empty()) << errMsg(true);
-    EXPECT_TRUE(blackKingCheck.empty()) << errMsg(false);
+    EXPECT_TRUE(whiteKingCheck.empty());
+    EXPECT_TRUE(blackKingCheck.empty());
 }
 
 TEST_F(ChessBoardTest, KingIsCheckedByPawn) {
@@ -139,6 +120,18 @@ TEST_F(ChessBoardTest, IsCheckmateTrueSimple) {
     b[Coord2D('h', 4).toFlatIdx()] = static_cast<char>(ChessPiece::BLACK_QUEEN);
     ChessBoard custom(b, Coord2D('e', 1), Coord2D('e', 8), true, true, true, true, std::nullopt, std::nullopt);
     EXPECT_EQ(CheckTerminal::isCheckmate(custom, true), CheckTerminal::MateStatus::CHECKMATE) << custom.getWhitePOV();
+}
+
+TEST_F(ChessBoardTest, IsCheckMateCustom1) {
+    std::string b(64, static_cast<Piece_t>(ChessPiece::NONE));
+    b[Coord2D('b', 1).toFlatIdx()] = b[Coord2D('b', 2).toFlatIdx()] = b[Coord2D('d', 1).toFlatIdx()] = static_cast<Piece_t>(ChessPiece::WHITE_ROOK);
+    b[Coord2D('c', 1).toFlatIdx()] = static_cast<Piece_t>(ChessPiece::WHITE_KING);
+    b[Coord2D('c', 2).toFlatIdx()] = static_cast<Piece_t>(ChessPiece::WHITE_BISHOP);
+    b[Coord2D('e', 1).toFlatIdx()] = b[Coord2D('e', 3).toFlatIdx()] = static_cast<Piece_t>(ChessPiece::BLACK_QUEEN);
+    b[Coord2D('e', 8).toFlatIdx()] = static_cast<Piece_t>(ChessPiece::BLACK_KING);
+
+    ChessBoard customBoard(b, Coord2D('c', 1), Coord2D('e', 8), false, false, false, false, std::nullopt, std::nullopt);
+    EXPECT_EQ(CheckTerminal::isCheckmate(customBoard, true), CheckTerminal::MateStatus::CHECKMATE) << customBoard.getWhitePOV();
 }
 
 TEST_F(ChessBoardTest, IsCheckmateFalseIfKingCanEscape) {
