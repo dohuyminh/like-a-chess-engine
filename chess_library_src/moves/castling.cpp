@@ -7,7 +7,7 @@
  * @param isWhiteTurn whether it is white player's turn to play (white: true, black: false)
  * @param isLeft whether the castling is done with the left rook (true) or the right rook (false)
  */
-Castling::Castling(bool isWhiteTurn, bool isLeft) : 
+Castling::Castling(bool isWhiteTurn, bool isLeft) noexcept : 
     ChessMove(isWhiteTurn), 
     _isLeft(isLeft) {}
 

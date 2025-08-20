@@ -20,7 +20,9 @@ QueensMove::QueensMove(const bool appliedPieceIsWhite, const Direction direction
     try {
         _origin + mv;
     } catch (std::invalid_argument const& e) {
-        std::string err = "Queen's movement results in out-of-bound coordinate";
+        std::string err = "Queen's movement results in out-of-bound coordinate:\n";
+        Coord2D cpy = origin;
+        err += "Attempting to move " + (std::string)mv + " from coordinate " + (std::string)cpy + '\n'; 
         throw std::invalid_argument(err);
     }
 }

@@ -26,6 +26,10 @@ public:
         return Vec2D(direction._mvCol * sign, direction._mvRow * sign);
     }
 
+    inline friend bool operator==(Vec2D v1, Vec2D v2) {
+        return v1._mvCol == v2._mvCol && v1._mvRow == v2._mvRow;
+    }
+
     inline operator std::string() const {
         std::string s = "<";
         s += std::to_string(_mvCol);

@@ -11,6 +11,8 @@ namespace CheckTerminal
         // store all coordinates of pieces capturing the king 
         std::unordered_set<Coord2D> res;
 
+        auto filterPiece = kingIsWhite ? pieceIsWhite : pieceIsBlack;
+
         // find the king's position
         Coord2D kingCoord = kingIsWhite ? board.whiteKingCoord() : board.blackKingCoord();
 
@@ -22,7 +24,7 @@ namespace CheckTerminal
                 
                 // if not the color -> skip
                 Piece_t currPiece = board.getPiece(coord);
-                if (currPiece == static_cast<char>(ChessPiece::NONE) || (kingIsWhite == pieceIsWhite(currPiece))) {
+                if (filterPiece(currPiece)) {
                     continue;
                 }
                 

@@ -5,16 +5,21 @@
 #include "underpromotion.h"
 #include "castling.h"
 #include "../check_terminal/check.h"
+#include "../square_iterator/next_square_iterator.h"
 
 #include <stdexcept>
 
 static void insertAllPossibleMoves(const ChessBoard& board, Coord2D pieceCoord, bool isWhiteTurn, std::vector<std::shared_ptr<ChessMove>>& moves);
+static void generateMove(Coord2D origin, bool isWhiteTurn, Vec2D mv, Piece_t pieceAtOrigin, std::vector<std::shared_ptr<ChessMove>>& moves);
 
 std::vector<std::shared_ptr<ChessMove>> getAllMoves(
     const ChessBoard& board,
     bool isWhiteTurn,
     bool checkForCheck
 ) {
+    
+    using namespace CheckTerminal;
+
     auto filterPiece = isWhiteTurn ? pieceIsWhite : pieceIsBlack;
     std::vector<std::shared_ptr<ChessMove>> moves;
 
@@ -35,6 +40,44 @@ std::vector<std::shared_ptr<ChessMove>> getAllMoves(
         }
     }
 
+    // cover castling 
+    if (kingIsChecked(board, isWhiteTurn).empty()) {
+        bool leftCastling = (isWhiteTurn && board.whiteLeftCastling()) || (!isWhiteTurn && board.blackLeftCastling());
+        bool rightCastling = (isWhiteTurn && board.whiteRightCastling()) || (!isWhiteTurn && board.blackRightCastling());
+        
+        Coord2D kingCoord = isWhiteTurn ? board.whiteKingCoord() : board.blackKingCoord();
+        Piece_t rook = isWhiteTurn ? static_cast<Piece_t>(ChessPiece::WHITE_ROOK) : 
+                                     static_cast<Piece_t>(ChessPiece::BLACK_ROOK); 
+
+        if (leftCastling) {
+            bool canPerform = true;
+            Vec2D mvVec = isWhiteTurn ? Vec2D(-1, 0) : Vec2D(1, 0);
+
+            for (Coord2D iter = kingCoord + mvVec; board.getPiece(iter) != rook; iter = iter + mvVec) {
+                Piece_t iterPiece = board.getPiece(iter);
+                if (iterPiece != static_cast<Piece_t>(ChessPiece::NONE)) {
+                    canPerform = false; break;
+                }
+            }
+            
+            if (canPerform) moves.push_back(std::make_shared<Castling>(isWhiteTurn, true));
+        }
+
+        if (rightCastling) {
+            bool canPerform = true;
+            Vec2D mvVec = isWhiteTurn ? Vec2D(1, 0) : Vec2D(-1, 0);
+
+            for (Coord2D iter = kingCoord + mvVec; board.getPiece(iter) != rook; iter = iter + mvVec) {
+                Piece_t iterPiece = board.getPiece(iter);
+                if (iterPiece != static_cast<Piece_t>(ChessPiece::NONE)) {
+                    canPerform = false; break;
+                }
+            }
+
+            if (canPerform) moves.push_back(std::make_shared<Castling>(isWhiteTurn, false));
+        }
+    }
+
     // if checkForCheck is true, filter out moves that result in check
     if (checkForCheck) {
         std::remove_if(moves.begin(), moves.end(), [&board, isWhiteTurn](const std::shared_ptr<ChessMove>& move) {
@@ -44,7 +87,7 @@ std::vector<std::shared_ptr<ChessMove>> getAllMoves(
                 return true; // move is invalid
             }
             // check if the king is checked after the move
-            return !CheckTerminal::kingIsChecked(*newState, isWhiteTurn).empty();
+            return !kingIsChecked(*newState, isWhiteTurn).empty();
         });
     }
 
@@ -52,136 +95,51 @@ std::vector<std::shared_ptr<ChessMove>> getAllMoves(
 }
 
 static void insertAllPossibleMoves(const ChessBoard& board, Coord2D pieceCoord, bool isWhiteTurn, std::vector<std::shared_ptr<ChessMove>>& moves) {
-    Piece_t piece = board.getPiece(pieceCoord);
-    if (piece == static_cast<char>(ChessPiece::NONE)) {
-        return; // no piece at this square
-    }
+    
+    Piece_t pieceAtCoord = board.getPiece(pieceCoord);
+    bool isKnight = pieceAtCoord == static_cast<Piece_t>(ChessPiece::WHITE_KNIGHT) || 
+                    pieceAtCoord == static_cast<Piece_t>(ChessPiece::BLACK_KNIGHT);
 
-    if (piece == static_cast<char>(ChessPiece::WHITE_PAWN) || piece == static_cast<char>(ChessPiece::BLACK_PAWN)) 
-    {
-        // pedantic check for pawn's position
-        if ((isWhiteTurn && pieceCoord.row() == 8) || (!isWhiteTurn && pieceCoord.row() == 1)) {
-            throw std::logic_error("FATAL ERROR: PAWNS REACHING LAST ROW SHOULD HAVE BEEN PROMOTED");
-        }
+    std::vector<Coord2D> possibleSquares = findAvailableSquares(board, pieceCoord);
+    for (Coord2D dest: possibleSquares) {
         
-        // check for pawn's forward movement
-        Vec2D forward = (isWhiteTurn) ? Vec2D(0, 1) : Vec2D(0, -1);
-        if (board.getPiece(pieceCoord + forward) == static_cast<char>(ChessPiece::NONE)){
-            moves.push_back(std::make_shared<QueensMove>(QueensMove(isWhiteTurn, Direction::UP, 1, pieceCoord)));
-            
-            bool isOrigin = (isWhiteTurn && pieceCoord.row() == 2) || (!isWhiteTurn && pieceCoord.row() == 7);
-            if (isOrigin && board.getPiece(pieceCoord + forward * 2) == static_cast<char>(ChessPiece::NONE)) {
-                moves.push_back(std::make_shared<QueensMove>(QueensMove(isWhiteTurn, Direction::UP, 2, pieceCoord)));
-            } 
-        }
+        int originX = pieceCoord.col() - 'a', destX = dest.col() - 'a', 
+            originY = pieceCoord.row(), destY = dest.row();
         
-        // check for diagonal move (either by capturing another piece or en passant)
-        // left diagonal
-        Vec2D left = (isWhiteTurn) ? Vec2D(-1, 1) : Vec2D(1, -1);
-        bool canMoveLeft = (isWhiteTurn && pieceCoord.col() > 'a') || (!isWhiteTurn && pieceCoord.col() < 'h');
-        if (canMoveLeft && CheckTerminal::__pieceCanReachSquare(board, pieceCoord, pieceCoord + left)) {
-            moves.push_back(std::make_shared<QueensMove>(QueensMove(isWhiteTurn, Direction::UP_LEFT, 1, pieceCoord)));
-        }
+        int dx = destX - originX, dy = destY - originY;
+        Vec2D mv(dx, dy);
+        if (!isWhiteTurn) mv *= -1;
 
-        // right diagonal
-        Vec2D right = (isWhiteTurn) ? Vec2D(1, 1) : Vec2D(-1, -1);
-        bool canMoveRight = (isWhiteTurn && pieceCoord.col() < 'h') || (!isWhiteTurn && pieceCoord.col() > 'a');
-        if (canMoveRight && CheckTerminal::__pieceCanReachSquare(board, pieceCoord, pieceCoord + right)) {
-            moves.push_back(std::make_shared<QueensMove>(QueensMove(isWhiteTurn, Direction::UP_RIGHT, 1, pieceCoord)));
-        }
+        generateMove(pieceCoord, isWhiteTurn, mv, pieceAtCoord, moves);    
     }
-        
-    bool isKnight = piece == static_cast<char>(ChessPiece::WHITE_KNIGHT) || piece == static_cast<char>(ChessPiece::BLACK_KNIGHT);
-    bool isKing = piece == static_cast<char>(ChessPiece::WHITE_KING) || piece == static_cast<char>(ChessPiece::BLACK_KING);
-    if (isKnight || isKing)
-    {
-        const Vec2D* mvs = isKnight ? knightsMoveVec : vecMap;
-        for (int8_t mvIdx = 0; mvIdx < 8; ++mvIdx) {
-            try {
-                Coord2D dest = pieceCoord + mvs[mvIdx] * (isWhiteTurn ? 1 : -1);
-                Piece_t pieceAtDest = board.getPiece(dest);
-                if (pieceAtDest == static_cast<Piece_t>(ChessPiece::NONE) || 
-                    isWhiteTurn != pieceIsWhite(pieceAtDest)) {
-                
-                    std::shared_ptr<ChessMove> move;
-                    if (isKnight) {
-                        move = std::make_shared<KnightsMove>(KnightsMove(isWhiteTurn, mvs[mvIdx], pieceCoord));
-                    } else {
-                        move = std::make_shared<QueensMove>(QueensMove(isWhiteTurn, static_cast<Direction>(mvIdx), 1, pieceCoord));
-                    }
+}
 
-                    moves.push_back(move);
-                }
-            } catch (std::invalid_argument const& e) {
-                continue;
-            }
-        }
+static void generateMove(Coord2D origin, bool isWhiteTurn, Vec2D mv, Piece_t pieceAtOrigin, std::vector<std::shared_ptr<ChessMove>>& moves) {
+    bool isKnight = pieceAtOrigin == static_cast<Piece_t>(ChessPiece::WHITE_KNIGHT) || 
+                    pieceAtOrigin == static_cast<Piece_t>(ChessPiece::BLACK_KNIGHT);
+    if (isKnight) {
+        moves.push_back(std::make_shared<KnightsMove>(isWhiteTurn, mv, origin));
+        return;
     }
 
-    bool isQueen = piece == static_cast<char>(ChessPiece::WHITE_QUEEN) || piece == static_cast<char>(ChessPiece::BLACK_QUEEN);
-    bool isBishop = piece == static_cast<char>(ChessPiece::WHITE_BISHOP) || piece == static_cast<char>(ChessPiece::BLACK_BISHOP);
-    if (isQueen || isBishop)
-    {
-        // only check for diagonal
-        Direction vecs[4] = { Direction::UP_LEFT, Direction::UP_RIGHT, Direction::DOWN_LEFT, Direction::DOWN_RIGHT };
-        bool iterCheck[4] = { true, true, true, true };
-        int8_t nSteps = 1;
-        do {
-            
-            for (int8_t i = 0; i < 4; ++i) {
-                char   currCol = pieceCoord.col() + vecMap[vecs[i]].mvCol() * nSteps * (isWhiteTurn ? 1 : -1);
-                int8_t currRow = pieceCoord.row() + vecMap[vecs[i]].mvRow() * nSteps * (isWhiteTurn ? 1 : -1); 
-                iterCheck[i] = 'a' <= currCol && currCol <= 'h' && 1 <= currRow && currRow <= 8;
-                if (iterCheck[i]) {
-                    Coord2D curr(currCol, currRow);
-                    Piece_t currPiece = board.getPiece(curr);
+    uint8_t magnitude = std::max(std::abs(mv.mvCol()), std::abs(mv.mvRow()));
+    Vec2D dirVec(mv.mvCol() / magnitude, mv.mvRow() / magnitude);
+    
+    Direction dir = static_cast<Direction>(std::find(vecMap, vecMap + 8, dirVec) - vecMap);
+    moves.push_back(std::make_shared<QueensMove>(isWhiteTurn, dir, magnitude, origin));
 
-                    // if current square has a piece of the same color
-                    if (currPiece != static_cast<Piece_t>(ChessPiece::NONE) && 
-                        isWhiteTurn == pieceIsWhite(currPiece)) {
-                        
-                        iterCheck[i] = false; continue;
-                    }
 
-                    // insert it to list of possible moves; stop if it's a capture
-                    moves.push_back(std::make_shared<QueensMove>(QueensMove(isWhiteTurn, vecs[i], nSteps, pieceCoord)));
-                }
-            }
-            ++nSteps;
+    // if it's a pawn moving to the last rank, cover the cases of underpromotion
+    Piece_t pawn = isWhiteTurn ? static_cast<Piece_t>(ChessPiece::WHITE_PAWN) : static_cast<Piece_t>(ChessPiece::BLACK_PAWN);
+    int8_t row = isWhiteTurn ? 7 : 2;
+    bool pawnAtOrigin = pieceAtOrigin == pawn;
 
-        } while (iterCheck[0] || iterCheck[1] || iterCheck[2] || iterCheck[3]);
-    }
-
-    bool isRook = piece == static_cast<char>(ChessPiece::WHITE_ROOK) || piece == static_cast<char>(ChessPiece::BLACK_ROOK);
-    if (isQueen || isRook)
-    {
-        // only check for diagonal
-        Direction vecs[4] = { Direction::UP, Direction::DOWN, Direction::LEFT, Direction::RIGHT };
-        bool iterCheck[4] = { true, true, true, true };
-        int8_t nSteps = 1;
-        do {
-            
-            for (int8_t i = 0; i < 4; ++i) {
-                char   currCol = pieceCoord.col() + vecMap[vecs[i]].mvCol() * nSteps * (isWhiteTurn ? 1 : -1);
-                int8_t currRow = pieceCoord.row() + vecMap[vecs[i]].mvRow() * nSteps * (isWhiteTurn ? 1 : -1); 
-                iterCheck[i] = 'a' <= currCol && currCol <= 'h' && 1 <= currRow && currRow <= 8;
-                if (iterCheck[i]) {
-                    Coord2D curr(currCol, currRow);
-                    Piece_t currPiece = board.getPiece(curr);
-
-                    // if current square has a piece of the same color
-                    if (currPiece != static_cast<Piece_t>(ChessPiece::NONE) && 
-                        isWhiteTurn == pieceIsWhite(currPiece)) {
-                        
-                        iterCheck[i] = false; continue;
-                    }
-
-                    // insert it to list of possible moves; stop if it's a capture
-                    moves.push_back(std::make_shared<QueensMove>(QueensMove(isWhiteTurn, vecs[i], nSteps, pieceCoord)));
-                }
-            }
-            ++nSteps;
-
-        } while (iterCheck[0] || iterCheck[1] || iterCheck[2] || iterCheck[3]);
+    if (pawnAtOrigin && origin.row() == row) {
+        ChessPiece  p1 = (isWhiteTurn) ? ChessPiece::WHITE_ROOK : ChessPiece::BLACK_ROOK, 
+                    p2 = (isWhiteTurn) ? ChessPiece::WHITE_BISHOP : ChessPiece::BLACK_BISHOP, 
+                    p3 = (isWhiteTurn) ? ChessPiece::WHITE_KNIGHT : ChessPiece::BLACK_KNIGHT;
+        moves.push_back(std::make_shared<Underpromotion>(isWhiteTurn, dir, origin, p1));
+        moves.push_back(std::make_shared<Underpromotion>(isWhiteTurn, dir, origin, p2));
+        moves.push_back(std::make_shared<Underpromotion>(isWhiteTurn, dir, origin, p3));
     }
 }

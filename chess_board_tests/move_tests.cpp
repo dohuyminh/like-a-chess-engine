@@ -357,7 +357,7 @@ TEST(GetAllMoves, PawnPromotionMoves) {
     );
     auto moves = getAllMoves(board, true, false);
     // Pawn at A7 can move to A8 (promotion), or capture at B8 if enemy present
-    EXPECT_GE(moves.size(), 1);
+    EXPECT_GE(moves.size(), 4);
 
     raw[Coord2D('b', 8).toFlatIdx()] = static_cast<char>(ChessPiece::BLACK_KNIGHT);
     ChessBoard boardWithCapture(
@@ -366,7 +366,7 @@ TEST(GetAllMoves, PawnPromotionMoves) {
     );
     auto captureMoves = getAllMoves(boardWithCapture, true, false);
     // Now pawn can capture at B8
-    EXPECT_GE(captureMoves.size(), 2);
+    EXPECT_GE(captureMoves.size(), 8);
 }
 
 TEST(GetAllMoves, BlockedPawn) {

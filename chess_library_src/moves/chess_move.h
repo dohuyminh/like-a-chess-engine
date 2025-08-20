@@ -25,7 +25,7 @@ protected:
 public:
     ChessMove(bool appliedPieceIsWhite);
 
-    inline bool whiteMakesMove() {
+    inline bool whiteMakesMove() const {
         return _isWhite;
     }
 

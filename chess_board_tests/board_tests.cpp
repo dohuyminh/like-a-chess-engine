@@ -36,8 +36,30 @@ TEST_F(ChessBoardTest, GetPieceInvalidThrows) {
 }
 
 TEST_F(ChessBoardTest, KingIsCheckedNone) {
-    EXPECT_TRUE(CheckTerminal::kingIsChecked(board, true).empty());
-    EXPECT_TRUE(CheckTerminal::kingIsChecked(board, false).empty());
+    std::unordered_set<Coord2D> whiteKingCheck = CheckTerminal::kingIsChecked(board, true), 
+                                blackKingCheck = CheckTerminal::kingIsChecked(board, false);
+    
+    auto errMsg = [&](bool whiteKing) {
+        std::string err;
+        whiteKing ? err += board.getWhitePOV() : err += board.getBlackPOV();
+        if (whiteKing) {
+            err += "Pieces mistakenly checking white king:\n";
+            for (Coord2D c: whiteKingCheck) {
+                err += (std::string)c;
+                err.push_back('\n');
+            }
+        } else {
+            err += "Pieces mistakenly checking black king:\n";
+            for (Coord2D c: blackKingCheck) {
+                err += (std::string)c;
+                err.push_back('\n');
+            }
+        }
+        return err; 
+    };
+
+    EXPECT_TRUE(whiteKingCheck.empty()) << errMsg(true);
+    EXPECT_TRUE(blackKingCheck.empty()) << errMsg(false);
 }
 
 TEST_F(ChessBoardTest, KingIsCheckedByPawn) {
