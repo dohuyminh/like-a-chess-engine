@@ -1,7 +1,5 @@
 #include "r_rook.h"
 
-RRook::RRook() noexcept {}
-
 std::vector<Coord2D> RRook::pieceCanReachSquare(const ChessBoard& state, Coord2D origin) const {
 
     std::vector<Coord2D> res;

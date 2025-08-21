@@ -11,7 +11,7 @@ public:
 
     inline void addComponent(SquareReachability* component) {
         if (!component) {
-            throw std::invalid_argument("Null SquareReachability object passed into component addition");
+            throw std::invalid_argument("Null SquareReachability object passed into component addition; object must be created via the \"new\" keyword");
         }
         _components.push_back(component);
     }

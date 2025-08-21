@@ -1,7 +1,5 @@
 #include "r_bishop.h"
 
-RBishop::RBishop() {}
-
 std::vector<Coord2D> RBishop::pieceCanReachSquare(const ChessBoard& state, Coord2D origin) const {
     
     std::vector<Coord2D> res;

@@ -5,7 +5,7 @@
 class RRook final : public SquareReachability {
 public:
     
-    RRook() noexcept;
+    RRook() noexcept = default;
 
     std::vector<Coord2D> pieceCanReachSquare(
         const ChessBoard& state, 

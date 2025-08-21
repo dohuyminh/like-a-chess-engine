@@ -1,7 +1,5 @@
 #include "r_pawn.h"
 
-RPawn::RPawn() noexcept {}
-
 std::vector<Coord2D> RPawn::pieceCanReachSquare(const ChessBoard& state, Coord2D origin) const {
 
     std::vector<Coord2D> res;

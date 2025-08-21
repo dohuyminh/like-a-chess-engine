@@ -8,6 +8,7 @@
 #include "../square_iterator/next_square_iterator.h"
 
 #include <stdexcept>
+#include <iostream>
 
 static void insertAllPossibleMoves(const ChessBoard& board, Coord2D pieceCoord, bool isWhiteTurn, std::vector<std::shared_ptr<ChessMove>>& moves);
 static void generateMove(Coord2D origin, bool isWhiteTurn, Vec2D mv, Piece_t pieceAtOrigin, std::vector<std::shared_ptr<ChessMove>>& moves);
@@ -80,15 +81,15 @@ std::vector<std::shared_ptr<ChessMove>> getAllMoves(
 
     // if checkForCheck is true, filter out moves that result in check
     if (checkForCheck) {
-        std::remove_if(moves.begin(), moves.end(), [&board, isWhiteTurn](const std::shared_ptr<ChessMove>& move) {
+        
+        moves.erase(std::remove_if(moves.begin(), moves.end(), [&board, isWhiteTurn](const std::shared_ptr<ChessMove>& move) {
             // apply the move to the board
             std::optional<ChessBoard> newState = (*move)(board);
-            if (!newState.has_value()) {
-                return true; // move is invalid
-            }
+            auto check = kingIsChecked(newState.value(), isWhiteTurn);
             // check if the king is checked after the move
-            return !kingIsChecked(*newState, isWhiteTurn).empty();
-        });
+            return !check.empty();
+        }), moves.end());
+
     }
 
     return moves;

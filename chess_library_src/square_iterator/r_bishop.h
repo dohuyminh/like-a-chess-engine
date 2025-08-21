@@ -5,7 +5,7 @@
 class RBishop final : public SquareReachability {
 public:
     
-    RBishop();
+    RBishop() noexcept = default;
 
     std::vector<Coord2D> pieceCanReachSquare(
         const ChessBoard& state, 

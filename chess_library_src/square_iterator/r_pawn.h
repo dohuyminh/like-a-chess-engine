@@ -5,7 +5,7 @@
 class RPawn final : public SquareReachability {
 public:
     
-    RPawn() noexcept;
+    RPawn() noexcept = default;
 
     std::vector<Coord2D> pieceCanReachSquare(
         const ChessBoard& state, 
