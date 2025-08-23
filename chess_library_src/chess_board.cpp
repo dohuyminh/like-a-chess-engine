@@ -14,7 +14,7 @@
  */
 std::string ChessBoard::initRawBoard() {
     std::string rawBoard(
-        ChessBoard::BOARD_SIZE * ChessBoard::BOARD_SIZE, 
+        Coord2D::BOARD_SIZE * Coord2D::BOARD_SIZE, 
         static_cast<char>(ChessPiece::NONE)
     );
     
@@ -108,7 +108,7 @@ bool ChessBoard::operator==(const ChessBoard& other) const {
 std::string ChessBoard::getWhitePOV() const {
     std::string rep{"  a b c d e f g h\n"};
     
-    for (int8_t row = BOARD_SIZE - 1; row >= 0; --row) {
+    for (int8_t row = Coord2D::BOARD_SIZE - 1; row >= 0; --row) {
         
         rep.push_back(static_cast<char>('1' + row));
         rep.push_back('|');
@@ -132,7 +132,7 @@ std::string ChessBoard::getWhitePOV() const {
 std::string ChessBoard::getBlackPOV() const {
     std::string rep{"  h g f e d c b a\n"};
 
-    for (int8_t row = 1; row <= BOARD_SIZE; ++row) {
+    for (int8_t row = 1; row <= Coord2D::BOARD_SIZE; ++row) {
 
         rep.push_back(static_cast<char>('1' + row));
         rep.push_back('|');

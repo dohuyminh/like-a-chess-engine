@@ -8,29 +8,29 @@ class Vec2D {
 public:
     Vec2D(int8_t mvCol, int8_t mvRow) noexcept;
 
-    inline int8_t mvRow() const {
+    inline int8_t mvRow() const noexcept {
         return _mvRow;
     }
 
-    inline int8_t mvCol() const {
+    inline int8_t mvCol() const noexcept {
         return _mvCol;
     }
     
-    inline Vec2D& operator*=(int8_t num) {
+    inline Vec2D& operator*=(int8_t num) noexcept {
         this->_mvCol *= num;
         this->_mvRow *= num;
         return *this;
     }
 
-    inline friend Vec2D operator*(Vec2D direction, int8_t sign) {
+    inline friend Vec2D operator*(Vec2D direction, int8_t sign) noexcept {
         return Vec2D(direction._mvCol * sign, direction._mvRow * sign);
     }
 
-    inline friend bool operator==(Vec2D v1, Vec2D v2) {
+    inline friend bool operator==(Vec2D v1, Vec2D v2) noexcept {
         return v1._mvCol == v2._mvCol && v1._mvRow == v2._mvRow;
     }
 
-    inline operator std::string() const {
+    inline operator std::string() const noexcept {
         std::string s = "<";
         s += std::to_string(_mvCol);
         s.push_back(',');
@@ -80,12 +80,11 @@ public:
     }
 
     operator std::string();
-
+    
+    static constexpr int8_t BOARD_SIZE = 8;
 
 private:
     
-    static constexpr uint8_t BOARD_SIZE = 8;
-
     int8_t _row;
     char   _col;
 };

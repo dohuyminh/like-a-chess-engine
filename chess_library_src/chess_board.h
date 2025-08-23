@@ -22,7 +22,7 @@ public:
     ChessBoard();
 
     ChessBoard(
-        std::string  board,
+        std::string board,
         Coord2D whiteKingCoord,
         Coord2D blackKingCoord,
         bool whiteLeftCastling,
@@ -77,7 +77,6 @@ public:
 private:
     
     static std::string initRawBoard();
-    static constexpr int8_t BOARD_SIZE = 8;
 
     // raw board representation
     std::string _board;
