@@ -1,6 +1,6 @@
 <mxfile host="65bd71144e">
     <diagram id="MbsbiXn9RqepsuUvK-sm" name="Page-1">
-        <mxGraphModel dx="1339" dy="408" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+        <mxGraphModel dx="1486" dy="530" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -561,7 +561,7 @@
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
                 <mxCell id="222" value="&lt;i&gt;&amp;lt;&amp;lt;Enum&amp;gt;&amp;gt;&lt;/i&gt;&lt;div&gt;ChessPiece&lt;/div&gt;" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=40;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-                    <mxGeometry x="-450" y="137" width="210" height="698" as="geometry"/>
+                    <mxGeometry x="-560" y="137" width="210" height="698" as="geometry"/>
                 </mxCell>
                 <mxCell id="223" value="NONE" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="222">
                     <mxGeometry y="40" width="210" height="26" as="geometry"/>
@@ -642,7 +642,7 @@
                     <mxGeometry y="672" width="210" height="26" as="geometry"/>
                 </mxCell>
                 <mxCell id="251" value="&lt;i&gt;&amp;lt;&amp;lt;Enum&amp;gt;&amp;gt;&lt;/i&gt;&lt;div&gt;Color&lt;/div&gt;" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=43;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-                    <mxGeometry x="-790" y="408.5" width="160" height="155" as="geometry"/>
+                    <mxGeometry x="-840" y="408.5" width="160" height="155" as="geometry"/>
                 </mxCell>
                 <mxCell id="252" value="NONE" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="251">
                     <mxGeometry y="43" width="160" height="26" as="geometry"/>
@@ -659,10 +659,10 @@
                 <mxCell id="254" value="+ operator~(): Color" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="251">
                     <mxGeometry y="129" width="160" height="26" as="geometry"/>
                 </mxCell>
-                <mxCell id="285" value="is in" style="edgeStyle=none;html=1;endArrow=none;endFill=0;startArrow=diamondThin;startFill=1;" edge="1" parent="1" source="258" target="222">
+                <mxCell id="287" value="navigates using" style="edgeStyle=none;html=1;" edge="1" parent="1" source="258" target="205">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="287" value="navigates using" style="edgeStyle=none;html=1;" edge="1" parent="1" source="258" target="205">
+                <mxCell id="289" value="contains" style="edgeStyle=none;html=1;" edge="1" parent="1" source="258" target="222">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
                 <mxCell id="258" value="ChessBoard" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
@@ -742,6 +742,12 @@
                 </mxCell>
                 <mxCell id="283" value="+ getBlackPOB(): std::string" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" vertex="1" parent="258">
                     <mxGeometry y="762" width="270" height="26" as="geometry"/>
+                </mxCell>
+                <mxCell id="290" value="64" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+                    <mxGeometry x="-455" y="835" width="60" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="291" value="1" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+                    <mxGeometry x="-455" y="984" width="60" height="30" as="geometry"/>
                 </mxCell>
             </root>
         </mxGraphModel>
