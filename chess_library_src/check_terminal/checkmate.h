@@ -8,5 +8,5 @@ namespace CheckTerminal
         NONE, CHECK, CHECKMATE
     };
     
-    MateStatus isCheckmate(const ChessBoard& board, bool kingIsWhite);
+    MateStatus isCheckmate(const ChessBoard& board, Color kingsColor);
 } // namespace CheckTerminal

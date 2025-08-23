@@ -5,15 +5,14 @@
 
 namespace CheckTerminal
 {
-    std::unordered_set<Coord2D> kingIsChecked(const ChessBoard& board, bool kingIsWhite) {
-            
+    std::unordered_set<Coord2D> kingIsChecked(const ChessBoard& board, Color kingsColor) {
+        
         // store all coordinates of pieces capturing the king 
         std::unordered_set<Coord2D> res;
 
-        auto filterPiece = kingIsWhite ? pieceIsWhite : pieceIsBlack;
-
         // find the king's position
-        Coord2D kingCoord = kingIsWhite ? board.whiteKingCoord() : board.blackKingCoord();
+        Coord2D kingCoord = kingsColor == Color::WHITE ? board.whiteKingCoord() : board.blackKingCoord();
+        ChessPiece kingPiece = board.getPiece(kingCoord);
 
         // scan the board for all pieces of opposite color 
         for (char col = 'a'; col <= 'h'; ++col) {
@@ -22,8 +21,8 @@ namespace CheckTerminal
                 Coord2D coord(col, row);
                 
                 // if not the color -> skip
-                Piece_t currPiece = board.getPiece(coord);
-                if (filterPiece(currPiece)) {
+                ChessPiece currPiece = board.getPiece(coord);
+                if (!currPiece.captures(kingPiece)) {
                     continue;
                 }
                 

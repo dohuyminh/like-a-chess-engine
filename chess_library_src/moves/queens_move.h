@@ -17,7 +17,7 @@
  */
 class QueensMove final : public ChessMove {
 public:
-    QueensMove(bool appliedPieceIsWhite, Direction direction, uint8_t numSteps, Coord2D origin); 
+    QueensMove(Color color, Direction direction, uint8_t numSteps, Coord2D origin); 
     
     std::optional<ChessBoard> operator()(const ChessBoard& state) const override;
 
@@ -26,7 +26,7 @@ public:
     }
 
     inline Vec2D moveVec() const {
-        return vecMap[_direction] * _numSteps * (_isWhite ? 1 : -1);
+        return vecMap[_direction] * _numSteps * (_color == Color::WHITE ? 1 : -1);
     }
 
     ~QueensMove() override = default;

@@ -8,20 +8,17 @@ std::vector<Coord2D> RKingKnight::pieceCanReachSquare(const ChessBoard& state, C
 
     std::vector<Coord2D> res;
     
-    Piece_t pieceAtOrigin = state.getPiece(origin);
-    if (pieceAtOrigin == static_cast<Piece_t>(ChessPiece::NONE)) {
+    ChessPiece pieceAtOrigin = state.getPiece(origin);
+    if (pieceAtOrigin.isNone()) {
         return res;
     }
-
-    auto capture = pieceIsWhite(pieceAtOrigin) ? pieceIsBlack : pieceIsWhite;  
 
     for (int8_t i = 0; i < 8; ++i) {
         try {
             Coord2D dest = origin + _mvs[i];
-            Piece_t pieceAtDest = state.getPiece(dest);
+            ChessPiece pieceAtDest = state.getPiece(dest);
 
-            if (pieceAtDest == static_cast<Piece_t>(ChessPiece::NONE) || 
-                capture(pieceAtDest)) {
+            if (pieceAtDest.isNone() || pieceAtOrigin.captures(pieceAtDest)) {
 
                 res.push_back(dest);
             }            

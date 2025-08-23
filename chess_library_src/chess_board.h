@@ -33,43 +33,43 @@ public:
         const std::optional<Coord2D>& blackEnpassant
     );
 
-    [[nodiscard]] inline const std::string& board() const {
+    inline const std::string& board() const {
         return _board;
     }
     
-    [[nodiscard]] inline bool whiteLeftCastling() const {
+    inline bool whiteLeftCastling() const {
         return _whiteLeftCastling;
     }
 
-    [[nodiscard]] inline bool blackLeftCastling() const {
+     inline bool blackLeftCastling() const {
         return _blackLeftCastling;
     }
 
-    [[nodiscard]] inline bool whiteRightCastling() const {
+     inline bool whiteRightCastling() const {
         return _whiteRightCastling;
     }
 
-    [[nodiscard]] inline bool blackRightCastling() const {
+     inline bool blackRightCastling() const {
         return _blackRightCastling;
     }
 
-    [[nodiscard]] inline const std::optional<Coord2D>& whiteEnpassant() const {
+     inline const std::optional<Coord2D>& whiteEnpassant() const {
         return _whiteEnpassant;
     }
 
-    [[nodiscard]] inline const std::optional<Coord2D>& blackEnpassant() const {
+     inline const std::optional<Coord2D>& blackEnpassant() const {
         return _blackEnpassant;
     }
 
-    [[nodiscard]] inline const Coord2D& whiteKingCoord() const {
+    inline const Coord2D& whiteKingCoord() const {
         return _whiteKingCoord;
     }
 
-    [[nodiscard]] inline const Coord2D& blackKingCoord() const {
+     inline const Coord2D& blackKingCoord() const {
         return _blackKingCoord;
     }
 
-    Piece_t getPiece(Coord2D coord) const;
+    ChessPiece getPiece(Coord2D coord) const;
     bool operator==(const ChessBoard& other) const;
     std::string getWhitePOV() const;
     std::string getBlackPOV() const;

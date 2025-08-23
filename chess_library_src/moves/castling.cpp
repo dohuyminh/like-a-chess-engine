@@ -7,8 +7,8 @@
  * @param isWhiteTurn whether it is white player's turn to play (white: true, black: false)
  * @param isLeft whether the castling is done with the left rook (true) or the right rook (false)
  */
-Castling::Castling(bool isWhiteTurn, bool isLeft) noexcept : 
-    ChessMove(isWhiteTurn), 
+Castling::Castling(Color color, bool isLeft) noexcept : 
+    ChessMove(color), 
     _isLeft(isLeft) {}
 
 /**
@@ -19,7 +19,7 @@ Castling::Castling(bool isWhiteTurn, bool isLeft) noexcept :
  */
 std::optional<ChessBoard> Castling::operator()(const ChessBoard& state) const {
     // check if castling is allowed in the first place 
-    if (_isWhite) {
+    if (_color == Color::WHITE) {
         if ((_isLeft && !state.whiteLeftCastling()) || (!_isLeft && !state.whiteRightCastling())) {
             return std::nullopt;
         }
@@ -29,15 +29,15 @@ std::optional<ChessBoard> Castling::operator()(const ChessBoard& state) const {
     }
 
     // if the king is in check, castling is impossible
-    if (!CheckTerminal::kingIsChecked(state, _isWhite).empty()) {
+    if (!CheckTerminal::kingIsChecked(state, _color).empty()) {
         return std::nullopt;
     }
 
     // navigating appropriate rook and how they should move depends on _isWhite and _isLeft
-    bool navigate = (_isWhite && _isLeft) || (!_isWhite && !_isLeft);
+    bool navigate = (_color == Color::WHITE && _isLeft) || (_color == Color::BLACK  && !_isLeft);
 
     // check which king and which rook is going to move
-    int8_t row = (_isWhite) ? 1 : 8;
+    int8_t row = (_color == Color::WHITE) ? 1 : 8;
     char rookCol = navigate ? 'a' : 'h';
     Vec2D mv = navigate ? Vec2D(1, 0) : Vec2D(-1, 0);
     
@@ -50,7 +50,7 @@ std::optional<ChessBoard> Castling::operator()(const ChessBoard& state) const {
     // check if there are any pieces between the king and the rook
     for (Coord2D iter = rookPos + mv; iter != kingPos; iter = iter + mv) {
         // there exists a piece in between -> castling is impossible
-        if (rawBoard[iter.toFlatIdx()] != static_cast<char>(ChessPiece::NONE)) {
+        if (rawBoard[iter.toFlatIdx()] != ChessPiece::NONE) {
             return std::nullopt;
         }
     }
@@ -64,7 +64,7 @@ std::optional<ChessBoard> Castling::operator()(const ChessBoard& state) const {
     newBlackLeftCastling  = state.blackLeftCastling(), 
     newBlackRightCastling = state.blackRightCastling();
     
-    if (_isWhite) {
+    if (_color == Color::WHITE) {
         if (_isLeft) newWhiteLeftCastling = false;
         else newWhiteRightCastling = false;
     }
@@ -79,15 +79,15 @@ std::optional<ChessBoard> Castling::operator()(const ChessBoard& state) const {
     Vec2D kingMv = mv * -2;
     Coord2D newKingPos = kingPos + kingMv;
 
-    rawBoard[kingPos.toFlatIdx()] = static_cast<char>(ChessPiece::NONE);
+    rawBoard[kingPos.toFlatIdx()] = ChessPiece::NONE;
     rawBoard[newKingPos.toFlatIdx()] = king;
 
-    rawBoard[rookPos.toFlatIdx()] = static_cast<char>(ChessPiece::NONE);
+    rawBoard[rookPos.toFlatIdx()] = ChessPiece::NONE;
     rawBoard[(newKingPos + mv).toFlatIdx()] = rook;
 
     Coord2D newWhiteKingCoord = state.whiteKingCoord(), newBlackKingCoord = state.blackKingCoord();
 
-    if (_isWhite) {
+    if (_color == Color::WHITE) {
         newWhiteKingCoord = newKingPos;
     } else {
         newBlackKingCoord = newKingPos;

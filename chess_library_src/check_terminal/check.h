@@ -6,5 +6,5 @@
 
 namespace CheckTerminal
 {
-    std::unordered_set<Coord2D> kingIsChecked(const ChessBoard& board, bool kingIsWhite);
+    std::unordered_set<Coord2D> kingIsChecked(const ChessBoard& board, Color kingsColor);
 } // namespace CheckTerminal

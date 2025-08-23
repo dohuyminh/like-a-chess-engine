@@ -74,14 +74,15 @@ ChessBoard::ChessBoard(
 
 }
 
-Piece_t ChessBoard::getPiece(Coord2D coord) const {
+ChessPiece ChessBoard::getPiece(Coord2D coord) const {
     
     if (!(coord.row() >= 1 && coord.row() <= 8) && (coord.col() >= 'a' && coord.col() <= 'h')) {
         throw std::out_of_range("Position on the board must be <a-h><1-8>");
     }
 
     int idx = coord.toFlatIdx(); 
-    return _board[idx];
+    char p = _board[idx];
+    return ChessPiece(p);
 }
 
 bool ChessBoard::operator==(const ChessBoard& other) const {
@@ -112,12 +113,10 @@ std::string ChessBoard::getWhitePOV() const {
         rep.push_back(static_cast<char>('1' + row));
         rep.push_back('|');
 
-        for (int8_t col = 0; col < BOARD_SIZE; ++col) {
+        for (char col = 'a'; col <= 'h'; ++col) {
 
-            const int8_t idx = row * BOARD_SIZE + col;
-
-            Piece_t piece = _board[idx];
-            rep.append(PieceToAscii[piece - 1]); 
+            ChessPiece piece = getPiece({ col, row });
+            rep.append(piece.toAscii()); 
             rep.push_back('|');
         } 
         
@@ -133,17 +132,15 @@ std::string ChessBoard::getWhitePOV() const {
 std::string ChessBoard::getBlackPOV() const {
     std::string rep{"  h g f e d c b a\n"};
 
-    for (int8_t row = 0; row < BOARD_SIZE; ++row) {
+    for (int8_t row = 1; row <= BOARD_SIZE; ++row) {
 
         rep.push_back(static_cast<char>('1' + row));
         rep.push_back('|');
 
-        for (int8_t col = BOARD_SIZE - 1; col >= 0; --col) {
+        for (char col = 'h'; col >= 'a'; --col) {
 
-            const int8_t idx = row * BOARD_SIZE + col;
-
-            Piece_t piece = _board[idx];
-            rep.append(PieceToAscii[piece - 1]); 
+            ChessPiece piece = getPiece({ col, row });
+            rep.append(piece.toAscii()); 
             rep.push_back('|');
         }
 

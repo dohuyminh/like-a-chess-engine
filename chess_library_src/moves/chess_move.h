@@ -13,20 +13,24 @@ protected:
 
     static void updateCastling(
         const ChessBoard& state, 
-        bool originPieceIsWhite,
+        Color turn,
         Coord2D newPoint, 
         bool& newWhiteLeftCastling, 
         bool& newWhiteRightCastling, 
         bool& newBlackLeftCastling, 
         bool& newBlackRightCastling);
             
-        bool _isWhite;
+    Color _color;
         
 public:
-    ChessMove(bool appliedPieceIsWhite);
+    constexpr ChessMove(Color colorOfAppliedPiece) : _color(colorOfAppliedPiece) {
+        if (_color == Color::NONE) {
+            throw std::invalid_argument("Pieces can only be moved if the color is White/Black");
+        }
+    }
 
-    inline bool whiteMakesMove() const {
-        return _isWhite;
+    inline Color colorOfAppliedPiece() const {
+        return _color;
     }
 
     virtual std::optional<ChessBoard> operator()(const ChessBoard& state) const = 0;

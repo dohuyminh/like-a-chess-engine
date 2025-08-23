@@ -32,7 +32,7 @@ MoveResult KnightsAlgebraic::performMove(const ChessBoard& state) {
     an.push_back(dest.row() + '0');
 
     // if the move results in checking the opponent's king, note that
-    MateStatus ms = isCheckmate(nextState.value(), !_mv.whiteMakesMove());
+    MateStatus ms = isCheckmate(nextState.value(), ~_mv.colorOfAppliedPiece());
     if (ms == MateStatus::CHECK) {
         an.push_back('x');
     } else if (ms == MateStatus::CHECKMATE) {

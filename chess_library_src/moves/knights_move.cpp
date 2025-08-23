@@ -9,8 +9,8 @@
  * @param direction The direction at which the piece will move (NOTE: the direction can only either be <1,2>, <1,-2>, <2,1>, <2,-1>, <-1,2>, <-1,-2>, <-2,1> or <-2,-1>, reflecting the knight's "L" shape movement)
  * @param origin The location of the knight piece on the board that will be moved
  */
-KnightsMove::KnightsMove(const bool appliedPieceIsWhite, const Vec2D direction, const Coord2D origin) :
-    ChessMove(appliedPieceIsWhite),
+KnightsMove::KnightsMove(Color color, Vec2D direction, Coord2D origin) :
+    ChessMove(color),
     _direction(direction),
     _origin(origin) {
 
@@ -22,7 +22,7 @@ KnightsMove::KnightsMove(const bool appliedPieceIsWhite, const Vec2D direction, 
     }
 
     // if the knight is black -> reverse direction on board 
-    if (!_isWhite) {
+    if (_color == Color::BLACK) {
         _direction *= -1;
     }
 
@@ -42,40 +42,29 @@ KnightsMove::KnightsMove(const bool appliedPieceIsWhite, const Vec2D direction, 
  */
 std::optional<ChessBoard> KnightsMove::operator()(const ChessBoard& state) const {
     // locate the position of piece on board 
-    const Piece_t piece = state.getPiece(_origin);
+    ChessPiece piece = state.getPiece(_origin);
 
     // if there is no piece at the square, simply return invalid
-    if (piece == static_cast<char>(ChessPiece::NONE)) {
+    if (piece.isNone()) {
         return std::nullopt;
     }
     
     // if the piece is not a knight, return invalid
-    if (piece != static_cast<char>(ChessPiece::WHITE_KNIGHT) && 
-        piece != static_cast<char>(ChessPiece::BLACK_KNIGHT)) {
+    if (!piece.isKnight()) {
         return std::nullopt;
     }   
-
-    // knight is white/black
-    const bool knightIsWhite = piece == static_cast<char>(ChessPiece::WHITE_KNIGHT);
-
+    
     // does transformation apply to the correct piece color?
-    if (knightIsWhite != _isWhite) {
+    if (_color != piece.color()) {
         return std::nullopt;
     }
-
-    // get the raw board
-    std::string rawBoard = state.board();
-        
+            
     // get new point
     Coord2D newPoint = _origin + _direction;
 
-    const uint8_t originIdx = _origin.toFlatIdx();
-    // move
-    const uint8_t destIdx = newPoint.toFlatIdx();
 
     // check if the position is valid (i.e. knights cannot capture pieces of the same color)
-    if ((knightIsWhite && pieceIsWhite(rawBoard[destIdx])) || 
-        (!knightIsWhite && pieceIsBlack(rawBoard[destIdx]))) {
+    if (piece.color() == state.getPiece(newPoint).color()) {
 
         return std::nullopt;
     }
@@ -92,7 +81,15 @@ std::optional<ChessBoard> KnightsMove::operator()(const ChessBoard& state) const
         newBlackRightCastling = state.blackRightCastling();
     
     // update castling
-    updateCastling(state, knightIsWhite, newPoint, newWhiteLeftCastling, newWhiteRightCastling, newBlackLeftCastling, newBlackRightCastling);
+    updateCastling(state, _color, newPoint, newWhiteLeftCastling, newWhiteRightCastling, newBlackLeftCastling, newBlackRightCastling);
+
+    // get the raw board
+    std::string rawBoard = state.board();
+
+    const uint8_t originIdx = _origin.toFlatIdx();
+    // move
+    const uint8_t destIdx = newPoint.toFlatIdx();
+
 
     // transform the raw board 
     rawBoard[originIdx] = static_cast<char>(ChessPiece::NONE);

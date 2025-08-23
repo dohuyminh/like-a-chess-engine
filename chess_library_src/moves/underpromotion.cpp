@@ -10,15 +10,15 @@
  * @param origin The location of the pawn piece on the board that will be moved
  * @param promotePiece The piece that the pawn will be promoted to (NOTE: the piece can only be a rook, bishop or knight of the same color)
  */
-Underpromotion::Underpromotion(const bool appliedPieceIsWhite, const Direction direction, const Coord2D origin, const ChessPiece promotePiece) :
-    ChessMove(appliedPieceIsWhite),
+Underpromotion::Underpromotion(Color color, Direction direction, Coord2D origin, ChessPiece promotePiece) :
+    ChessMove(color),
     _direction(direction), 
     _origin(origin),
     _promotePiece(promotePiece)
 {
 
     // promotion should only be done at the 2nd first/last row in the board 
-    if ((!_isWhite && _origin.row() != 2) || (_isWhite && _origin.row() != 7)) {
+    if ((_color == Color::BLACK && _origin.row() != 2) || (_color == Color::WHITE && _origin.row() != 7)) {
         throw std::invalid_argument("Promotion may only apply for pawns at the 2nd last rows of their respective colors"); 
     }
 
@@ -29,11 +29,11 @@ Underpromotion::Underpromotion(const bool appliedPieceIsWhite, const Direction d
 
     // check if pieces at the edge are trying to go out of bound 
     if (
-        (_isWhite && (
+        (_color == Color::WHITE && (
             (_origin == Coord2D('a', 7) && _direction == Direction::UP_LEFT) || 
             (_origin == Coord2D('h', 7) && _direction == Direction::UP_RIGHT)
         )) || 
-        (!_isWhite && (
+        (_color == Color::BLACK && (
             (_origin == Coord2D('a', 2) && _direction == Direction::UP_RIGHT) ||
             (_origin == Coord2D('h', 2) && _direction == Direction::UP_LEFT)
         ))
@@ -42,11 +42,11 @@ Underpromotion::Underpromotion(const bool appliedPieceIsWhite, const Direction d
     }
 
     // promoted pawn can only be rook/bishop/knight
-    if ((!_isWhite && 
+    if ((_color == Color::BLACK && 
         _promotePiece != ChessPiece::BLACK_ROOK &&
         _promotePiece != ChessPiece::BLACK_KNIGHT && 
         _promotePiece != ChessPiece::BLACK_BISHOP) ||
-        (_isWhite &&
+        (_color == Color::WHITE &&
         _promotePiece != ChessPiece::WHITE_BISHOP && 
         _promotePiece != ChessPiece::WHITE_KNIGHT && 
         _promotePiece != ChessPiece::WHITE_ROOK)) {
@@ -63,23 +63,13 @@ Underpromotion::Underpromotion(const bool appliedPieceIsWhite, const Direction d
  */
 std::optional<ChessBoard> Underpromotion::operator()(const ChessBoard& state) const {
     // get the piece at origin 
-    Piece_t piece = state.getPiece(_origin);
-
-    // check the color of the piece 
-    bool pawnIsWhite = true;
-    
-    // if the pawn is white -> switch
-    if (piece == static_cast<char>(ChessPiece::BLACK_PAWN)) {
-        pawnIsWhite = false;
-    }
-
-    // neither black/white pawn -> transformation on an invalid piece 
-    else if (piece != static_cast<char>(ChessPiece::WHITE_PAWN)) {
+    ChessPiece piece = state.getPiece(_origin);
+    if (!piece.isPawn()) {
         return std::nullopt;
     }
-        
+
     // check if the transformation is applied to the right piece 
-    if (pawnIsWhite != _isWhite) {
+    if (_color != piece.color()) {
         return std::nullopt;
     }
 
@@ -88,25 +78,25 @@ std::optional<ChessBoard> Underpromotion::operator()(const ChessBoard& state) co
 
     // get direction and new piece position after transformation
     Vec2D dir = vecMap[_direction];
-    if (!_isWhite) dir *= -1;
+    if (_color == Color::BLACK) dir *= -1;
 
     Coord2D dest = _origin + dir;
-    uint8_t originIdx = _origin.toFlatIdx(), destIdx = dest.toFlatIdx();
+
+    ChessPiece pieceAtDest = state.getPiece(dest);
 
     // check if the destination is valid (i.e. pawn cannot capture piece of the same color)
-    if ((_isWhite && pieceIsWhite(rawBoard[destIdx])) || 
-        (!_isWhite && pieceIsBlack(rawBoard[destIdx]))) {
+    if (pieceAtDest.color() == _color) {
 
         return std::nullopt;
     }
 
     // diagonal moves may only be used for capturing pieces
-    if ((_direction == Direction::UP_LEFT || _direction == Direction::UP_RIGHT) && rawBoard[destIdx] == static_cast<char>(ChessPiece::NONE)) {
+    if ((_direction == Direction::UP_LEFT || _direction == Direction::UP_RIGHT) && pieceAtDest.isNone()) {
         return std::nullopt;
     }
 
     // forward move is impossible if there is a piece in front
-    if (_direction == Direction::UP && rawBoard[destIdx] != static_cast<char>(ChessPiece::NONE)) {
+    if (_direction == Direction::UP && !pieceAtDest.isNone()) {
         return std::nullopt;
     }
 
@@ -120,11 +110,12 @@ std::optional<ChessBoard> Underpromotion::operator()(const ChessBoard& state) co
         newBlackLeftCastling  = state.blackLeftCastling(),
         newBlackRightCastling = state.blackRightCastling();
 
-    updateCastling(state, pawnIsWhite, dest, newWhiteLeftCastling, newWhiteRightCastling, newBlackLeftCastling, newBlackRightCastling);
+    updateCastling(state, _color, dest, newWhiteLeftCastling, newWhiteRightCastling, newBlackLeftCastling, newBlackRightCastling);
 
+    uint8_t originIdx = _origin.toFlatIdx(), destIdx = dest.toFlatIdx();
     // perform transformation on raw board 
-    rawBoard[originIdx] = static_cast<char>(ChessPiece::NONE);
-    rawBoard[destIdx] = static_cast<char>(_promotePiece);
+    rawBoard[originIdx] = ChessPiece::NONE;
+    rawBoard[destIdx] = _promotePiece;
 
     return ChessBoard(
         rawBoard, 

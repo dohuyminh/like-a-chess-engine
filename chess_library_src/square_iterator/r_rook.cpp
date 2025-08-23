@@ -4,11 +4,10 @@ std::vector<Coord2D> RRook::pieceCanReachSquare(const ChessBoard& state, Coord2D
 
     std::vector<Coord2D> res;
     
-    if (state.getPiece(origin) == static_cast<Piece_t>(ChessPiece::NONE)) {
+    ChessPiece pieceAtOrigin = state.getPiece(origin);
+    if (pieceAtOrigin.isNone()) {
         return res;
     }
-
-    auto capture = pieceIsWhite(state.getPiece(origin)) ? pieceIsBlack : pieceIsWhite;
 
     // only scan for up; down; left; right 
     const Vec2D mv[4] = { Vec2D(0, 1), Vec2D(0, -1), Vec2D(-1, 0), Vec2D(1, 0) };
@@ -34,9 +33,9 @@ std::vector<Coord2D> RRook::pieceCanReachSquare(const ChessBoard& state, Coord2D
             if (canGo[i]) {
                 // verify if the position is not occupied by same-color piece 
                 Coord2D dest(nextCol, nextRow);
-                Piece_t pieceAtDest = state.getPiece(dest); 
-                bool isNone = pieceAtDest == static_cast<Piece_t>(ChessPiece::NONE);
-                bool isCapture = capture(pieceAtDest);
+                ChessPiece pieceAtDest = state.getPiece(dest); 
+                bool isNone = pieceAtDest.isNone();
+                bool isCapture = pieceAtOrigin.captures(pieceAtDest);
 
                 if (!isNone && !isCapture) {
                     canGo[i] = false; continue;
@@ -45,7 +44,7 @@ std::vector<Coord2D> RRook::pieceCanReachSquare(const ChessBoard& state, Coord2D
                 res.push_back(dest);
 
                 // if it's a capture, stop there
-                if (capture(pieceAtDest)) {
+                if (isCapture) {
                     canGo[i] = false;
                 }   
             }

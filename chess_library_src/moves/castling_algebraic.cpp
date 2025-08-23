@@ -20,7 +20,7 @@ MoveResult CastlingAlgebraic::performMove(const ChessBoard& state) {
     std::string an = (_mv.moveLeft()) ? "0-0-0" : "0-0"; 
     
     // if the move checks the opponent's king, denote at the end with "x" (check) or "xx" (checkmate)
-    MateStatus ms = isCheckmate(nextState.value(), !_mv.whiteMakesMove());
+    MateStatus ms = isCheckmate(nextState.value(), ~_mv.colorOfAppliedPiece());
 
     if (ms == MateStatus::CHECK) {
         an.push_back('x');

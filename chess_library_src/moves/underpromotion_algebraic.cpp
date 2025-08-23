@@ -50,7 +50,7 @@ MoveResult UnderpromotionAlgebraic::performMove(const ChessBoard& state) {
     }
 
     // if the resulting state checks the opponent's king, note that
-    MateStatus ms = isCheckmate(nextState.value(), !_mv.whiteMakesMove());
+    MateStatus ms = isCheckmate(nextState.value(), ~_mv.colorOfAppliedPiece());
     if (ms == MateStatus::CHECK) {
         an.push_back('x');
     } else if (ms == MateStatus::CHECKMATE) {

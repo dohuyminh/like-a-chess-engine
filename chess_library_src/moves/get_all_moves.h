@@ -15,6 +15,6 @@
  */
 std::vector<std::shared_ptr<ChessMove>> getAllMoves(
     const ChessBoard& state, 
-    bool isWhiteTurn, 
+    Color turn, 
     bool checkForCheck = true 
 );

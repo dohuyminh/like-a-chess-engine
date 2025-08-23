@@ -10,7 +10,7 @@
  */
 class KnightsMove final : public ChessMove {
 public:
-    KnightsMove(bool appliedPieceIsWhite, Vec2D direction, Coord2D origin);
+    KnightsMove(Color color, Vec2D direction, Coord2D origin);
 
     std::optional<ChessBoard> operator()(const ChessBoard& state) const override;
 

@@ -76,7 +76,7 @@ MoveResult QueensAlgebraic::performMove(const ChessBoard& state) {
     }
 
     // if the next state results in opponent's king being checked, note that
-    MateStatus ms = isCheckmate(nextState.value(), !_mv.whiteMakesMove());
+    MateStatus ms = isCheckmate(nextState.value(), ~_mv.colorOfAppliedPiece());
     if (ms == MateStatus::CHECK) {
         an.push_back('x');
     } else if (ms == MateStatus::CHECKMATE) {

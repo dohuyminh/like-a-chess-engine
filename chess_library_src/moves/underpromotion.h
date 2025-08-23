@@ -10,7 +10,7 @@
  */
 class Underpromotion final : public ChessMove {
 public:
-    Underpromotion(bool appliedPieceIsWhite, Direction direction, Coord2D origin, ChessPiece promotePiece);
+    Underpromotion(Color color, Direction direction, Coord2D origin, ChessPiece promotePiece);
 
     std::optional<ChessBoard> operator()(const ChessBoard& state) const override;
 
@@ -19,7 +19,7 @@ public:
     }
 
     inline Vec2D moveVec() const {
-        return vecMap[_direction] * (_isWhite ? 1 : -1);
+        return vecMap[_direction] * (_color == Color::WHITE ? 1 : -1);
     }
 
     inline ChessPiece promotePiece() const {
