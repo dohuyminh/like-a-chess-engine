@@ -56,7 +56,6 @@ MoveResult QueensAlgebraic::performMove(const ChessBoard& state) {
     Coord2D dest = _mv.origin() + _mv.moveVec();
     bool originPieceIsWhitePawn = pieceAtOrigin == static_cast<Piece_t>(ChessPiece::WHITE_PAWN);
     bool originPieceIsBlackPawn = pieceAtOrigin == static_cast<Piece_t>(ChessPiece::BLACK_PAWN); 
-    bool originPieceIsPawn = originPieceIsBlackPawn || originPieceIsWhitePawn;
 
     if (state.getPiece(dest) != static_cast<Piece_t>(ChessPiece::NONE) ||
         (originPieceIsWhitePawn && dest == state.whiteEnpassant()) || 

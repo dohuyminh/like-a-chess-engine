@@ -135,7 +135,7 @@ static void generateMove(Coord2D origin, Vec2D mv, ChessPiece pieceAtOrigin, std
     uint8_t magnitude = std::max(std::abs(mv.mvCol()), std::abs(mv.mvRow()));
     Vec2D dirVec(mv.mvCol() / magnitude, mv.mvRow() / magnitude);
     
-    Direction dir = static_cast<Direction>(std::find(vecMap, vecMap + 8, dirVec) - vecMap);
+    auto dir = static_cast<Direction>(std::find(vecMap, vecMap + 8, dirVec) - vecMap);
     moves.push_back(std::make_shared<QueensMove>(pieceAtOrigin.color(), dir, magnitude, origin));
 
 

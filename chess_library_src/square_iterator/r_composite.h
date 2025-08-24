@@ -16,12 +16,12 @@ public:
         _components.push_back(component);
     }
 
-    std::vector<Coord2D> pieceCanReachSquare(
+    [[nodiscard]] std::vector<Coord2D> pieceCanReachSquare(
         const ChessBoard& state,
         Coord2D origin
     ) const override;
 
-    ~RComposite();
+    ~RComposite() override;
 
 private:
     std::vector< SquareReachability* > _components;

@@ -8,11 +8,11 @@ class Vec2D {
 public:
     Vec2D(int8_t mvCol, int8_t mvRow) noexcept;
 
-    inline int8_t mvRow() const noexcept {
+    [[nodiscard]] inline int8_t mvRow() const noexcept {
         return _mvRow;
     }
 
-    inline int8_t mvCol() const noexcept {
+    [[nodiscard]] inline int8_t mvCol() const noexcept {
         return _mvCol;
     }
     
@@ -30,7 +30,7 @@ public:
         return v1._mvCol == v2._mvCol && v1._mvRow == v2._mvRow;
     }
 
-    inline operator std::string() const noexcept {
+    inline explicit operator std::string() const noexcept {
         std::string s = "<";
         s += std::to_string(_mvCol);
         s.push_back(',');
@@ -49,11 +49,11 @@ public:
     Coord2D() noexcept;
     Coord2D(char col, int8_t row);
     
-    inline int8_t row() const noexcept {
+    [[nodiscard]] inline int8_t row() const noexcept {
         return _row;
     }
 
-    inline char col() const noexcept {
+    [[nodiscard]] inline char col() const noexcept {
         return _col;
     }
 
@@ -75,7 +75,7 @@ public:
         return *this;
     }
 
-    inline uint8_t toFlatIdx() const noexcept {
+    [[nodiscard]] inline uint8_t toFlatIdx() const noexcept {
         return Coord2D::BOARD_SIZE * (_row - 1) + (_col - 'a');
     }
 

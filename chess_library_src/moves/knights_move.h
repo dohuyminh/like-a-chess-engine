@@ -14,11 +14,11 @@ public:
 
     std::optional<ChessBoard> operator()(const ChessBoard& state) const override;
 
-    inline Coord2D origin() const {
+    [[nodiscard]] inline Coord2D origin() const {
         return _origin;
     } 
 
-    inline Vec2D moveVec() const {
+    [[nodiscard]] inline Vec2D moveVec() const {
         return _direction;
     }
 

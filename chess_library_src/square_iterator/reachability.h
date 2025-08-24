@@ -6,7 +6,9 @@
 
 class SquareReachability {
 public:
-    virtual std::vector<Coord2D> pieceCanReachSquare(
+    virtual ~SquareReachability() = default;
+
+    [[nodiscard]] virtual std::vector<Coord2D> pieceCanReachSquare(
         const ChessBoard& state, 
         Coord2D origin) const = 0;
 };

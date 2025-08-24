@@ -8,6 +8,9 @@
 typedef std::pair<std::string, ChessBoard> MoveResult;
 
 class AlgebraicNotation {
+public:
+    virtual ~AlgebraicNotation() = default;
+
 protected:
     virtual MoveResult performMove(const ChessBoard& state);         
 };

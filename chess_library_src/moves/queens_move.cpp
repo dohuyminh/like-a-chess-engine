@@ -5,7 +5,7 @@
 /**
  * Constructor for the Queen's move. 
  * 
- * @param appliedPieceIsWhite Whether it is white player's turn to play (white: true, black: false)
+ * @param color The color of the piece
  * @param direction The direction at which the piece will move
  * @param numSteps How far the piece will go on the board
  * @param origin The position of the piece that will be moved

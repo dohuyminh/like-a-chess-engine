@@ -5,7 +5,7 @@
 /**
  * @brief Construct for the Underpromotion's move 
  * 
- * @param appliedPieceIsWhite whether it is white player's turn to play (white: true, black: false)
+ * @param color The color of the pawn
  * @param direction The direction at which the piece will move (NOTE: the direction can only either be UP, UP_LEFT or UP_RIGHT)
  * @param origin The location of the pawn piece on the board that will be moved
  * @param promotePiece The piece that the pawn will be promoted to (NOTE: the piece can only be a rook, bishop or knight of the same color)

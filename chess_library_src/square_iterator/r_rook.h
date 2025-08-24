@@ -7,8 +7,8 @@ public:
     
     RRook() noexcept = default;
 
-    std::vector<Coord2D> pieceCanReachSquare(
+    [[nodiscard]] std::vector<Coord2D> pieceCanReachSquare(
         const ChessBoard& state, 
-        Coord2D origin) const;
+        Coord2D origin) const override;
 
 };

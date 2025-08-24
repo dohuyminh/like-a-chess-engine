@@ -5,8 +5,6 @@
 #include "r_bishop.h"
 #include "r_composite.h"
 
-#include <memory>
-
 std::vector<Coord2D> findAvailableSquares(const ChessBoard& state, Coord2D pieceCoord) {
 
     ChessPiece pieceAtOrigin = state.getPiece(pieceCoord);

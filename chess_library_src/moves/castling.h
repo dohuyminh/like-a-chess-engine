@@ -13,7 +13,7 @@ class Castling final : public ChessMove {
 public:
     Castling(Color color, bool isLeft) noexcept;
 
-    inline bool moveLeft() const noexcept {
+    [[nodiscard]] inline bool moveLeft() const noexcept {
         return _isLeft;
     }
 

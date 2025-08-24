@@ -5,7 +5,7 @@
 /**
  * @brief Constructor for the Knight's move.
  * 
- * @param appliedPieceIsWhite whether it is white player's turn to play (white: true, black: false) 
+ * @param color the color of the knight
  * @param direction The direction at which the piece will move (NOTE: the direction can only either be <1,2>, <1,-2>, <2,1>, <2,-1>, <-1,2>, <-1,-2>, <-2,1> or <-2,-1>, reflecting the knight's "L" shape movement)
  * @param origin The location of the knight piece on the board that will be moved
  */

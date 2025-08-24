@@ -53,53 +53,53 @@ public:
         return _piece;
     }
 
-    inline const char* toAscii() const {
+    [[nodiscard]] inline const char* toAscii() const {
         return PieceToAscii[_piece - 1];
     }
 
-    inline bool isNone() const {
+    [[nodiscard]] inline bool isNone() const {
         return _piece == NONE;
     }
 
-    inline bool isWhite() const {
+    [[nodiscard]] inline bool isWhite() const {
         return WHITE_PAWN <= _piece && _piece <= WHITE_KING;
     }
 
-    inline bool isBlack() const {
+    [[nodiscard]] inline bool isBlack() const {
         return BLACK_PAWN <= _piece && _piece <= BLACK_KING;
     }
 
-    inline Color color() const {
+    [[nodiscard]] inline Color color() const {
         if (isNone()) return Color::NONE;
         if (isWhite()) return Color::WHITE;
         return Color::BLACK;
     } 
 
-    inline bool captures(ChessPiece other) const {
+    [[nodiscard]] inline bool captures(ChessPiece other) const {
         return !isNone() && !other.isNone() && ((isWhite() && other.isBlack()) || (isBlack() && other.isWhite()));
     }
 
-    inline bool isPawn() const {
+    [[nodiscard]] inline bool isPawn() const {
         return _piece == WHITE_PAWN || _piece == BLACK_PAWN;
     }
 
-    inline bool isRook() const {
+    [[nodiscard]] inline bool isRook() const {
         return _piece == WHITE_ROOK || _piece == BLACK_ROOK;
     }
 
-    inline bool isKnight() const {
+    [[nodiscard]] inline bool isKnight() const {
         return _piece == WHITE_KNIGHT || _piece == BLACK_KNIGHT;
     }
 
-    inline bool isBishop() const {
+    [[nodiscard]] inline bool isBishop() const {
         return _piece == WHITE_BISHOP || _piece == BLACK_BISHOP;
     }
 
-    inline bool isQueen() const {
+    [[nodiscard]] inline bool isQueen() const {
         return _piece == WHITE_QUEEN || _piece == BLACK_QUEEN;
     }
 
-    inline bool isKing() const {
+    [[nodiscard]] inline bool isKing() const {
         return _piece == WHITE_KING || _piece == BLACK_KING;
     }
 

@@ -4,7 +4,7 @@
 /**
  * @brief Construct for the Castling's move
  * 
- * @param isWhiteTurn whether it is white player's turn to play (white: true, black: false)
+ * @param color the color of the player performing castling
  * @param isLeft whether the castling is done with the left rook (true) or the right rook (false)
  */
 Castling::Castling(Color color, bool isLeft) noexcept : 

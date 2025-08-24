@@ -23,13 +23,13 @@ protected:
     Color _color;
         
 public:
-    constexpr ChessMove(Color colorOfAppliedPiece) : _color(colorOfAppliedPiece) {
+    constexpr explicit ChessMove(Color colorOfAppliedPiece) : _color(colorOfAppliedPiece) {
         if (_color == Color::NONE) {
             throw std::invalid_argument("Pieces can only be moved if the color is White/Black");
         }
     }
 
-    inline Color colorOfAppliedPiece() const {
+    [[nodiscard]] inline Color colorOfAppliedPiece() const {
         return _color;
     }
 

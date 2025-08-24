@@ -31,8 +31,8 @@ TEST_F(ChessBoardTest, GetPieceValid) {
 }
 
 TEST_F(ChessBoardTest, GetPieceInvalidThrows) {
-    EXPECT_THROW(board.getPiece(Coord2D('i', 1)), std::invalid_argument);
-    EXPECT_THROW(board.getPiece(Coord2D('a', 9)), std::invalid_argument);
+    EXPECT_THROW((void) board.getPiece(Coord2D('i', 1)), std::invalid_argument);
+    EXPECT_THROW((void) board.getPiece(Coord2D('a', 9)), std::invalid_argument);
 }
 
 TEST_F(ChessBoardTest, KingIsCheckedNone) {

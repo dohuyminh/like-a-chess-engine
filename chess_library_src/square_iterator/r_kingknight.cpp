@@ -24,7 +24,6 @@ std::vector<Coord2D> RKingKnight::pieceCanReachSquare(const ChessBoard& state, C
             }            
 
         } catch (std::invalid_argument const&) {
-            continue;
         }
     }
 

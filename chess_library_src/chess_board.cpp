@@ -69,8 +69,8 @@ ChessBoard::ChessBoard(
     _blackRightCastling(blackRightCastling),
     _whiteEnpassant(whiteEnpassant),
     _blackEnpassant(blackEnpassant),
-    _whiteKingCoord(std::move(whiteKingCoord)),
-    _blackKingCoord(std::move(blackKingCoord)) {
+    _whiteKingCoord(whiteKingCoord),
+    _blackKingCoord(blackKingCoord) {
 
 }
 
