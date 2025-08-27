@@ -43,7 +43,7 @@ public:
         return internal::utility::getData(_boardData, coord);
     }
 
-    bool operator==(const ChessBoard& other) const {
+    inline bool operator==(const ChessBoard& other) const {
         return memcmp(_boardData, other.boardData(), 34) == 0;
     }
 
