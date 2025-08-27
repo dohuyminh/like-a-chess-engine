@@ -1,4 +1,6 @@
 #include "chess_board.h"
+#include "utility.h"
+
 #include <stdexcept>
 #include <utility>
 
@@ -6,103 +8,50 @@
 
 // namespace py = pybind11;
 
-/**
- * @brief A private static method of `ChessBoard` class. Returns a string representation of a chess board
- * when starting the game.
- * 
- * @return `std::string` raw string as initial board state  
- */
-std::string ChessBoard::initRawBoard() {
-    std::string rawBoard(
-        Coord2D::BOARD_SIZE * Coord2D::BOARD_SIZE, 
-        static_cast<char>(ChessPiece::NONE)
-    );
+void ChessBoard::_initData() {
     
-    // assign pawns
-    for (int p =  8; p <= 15; ++p) rawBoard[p] = static_cast<char>(ChessPiece::WHITE_PAWN);
-    for (int p = 48; p <= 55; ++p) rawBoard[p] = static_cast<char>(ChessPiece::BLACK_PAWN);
+    // initialize pawns 
+    for (char col = 'a'; col <= 'h'; ++col) {
+        internal::utility::writeData(_boardData, Coord2D(col, 2), ChessPiece::WHITE_PAWN);
+        internal::utility::writeData(_boardData, Coord2D(col, 7), ChessPiece::BLACK_PAWN);
+    }
 
-    // assign everything else 
-    rawBoard[0] = rawBoard[7] = static_cast<char>(ChessPiece::WHITE_ROOK);
-    rawBoard[1] = rawBoard[6] = static_cast<char>(ChessPiece::WHITE_KNIGHT);
-    rawBoard[2] = rawBoard[5] = static_cast<char>(ChessPiece::WHITE_BISHOP);
-    rawBoard[4] = static_cast<char>(ChessPiece::WHITE_KING);
-    rawBoard[3] = static_cast<char>(ChessPiece::WHITE_QUEEN);
+    // initialize rooks
+    internal::utility::writeData(_boardData, Coord2D('a', 1), ChessPiece::WHITE_ROOK);
+    internal::utility::writeData(_boardData, Coord2D('h', 1), ChessPiece::WHITE_ROOK);
+    internal::utility::writeData(_boardData, Coord2D('a', 8), ChessPiece::BLACK_ROOK);
+    internal::utility::writeData(_boardData, Coord2D('h', 8), ChessPiece::BLACK_ROOK);
 
-    rawBoard[56] = rawBoard[63] = static_cast<char>(ChessPiece::BLACK_ROOK);
-    rawBoard[57] = rawBoard[62] = static_cast<char>(ChessPiece::BLACK_KNIGHT);
-    rawBoard[58] = rawBoard[61] = static_cast<char>(ChessPiece::BLACK_BISHOP);
-    rawBoard[60] = static_cast<char>(ChessPiece::BLACK_KING);
-    rawBoard[59] = static_cast<char>(ChessPiece::BLACK_QUEEN);
+    // initialize knights
+    internal::utility::writeData(_boardData, Coord2D('b', 1), ChessPiece::WHITE_KNIGHT);
+    internal::utility::writeData(_boardData, Coord2D('g', 1), ChessPiece::WHITE_KNIGHT);
+    internal::utility::writeData(_boardData, Coord2D('b', 8), ChessPiece::BLACK_KNIGHT);
+    internal::utility::writeData(_boardData, Coord2D('g', 8), ChessPiece::BLACK_KNIGHT);
 
-    return rawBoard;
-}
+    // initialize bishops
+    internal::utility::writeData(_boardData, Coord2D('c', 1), ChessPiece::WHITE_BISHOP);
+    internal::utility::writeData(_boardData, Coord2D('f', 1), ChessPiece::WHITE_BISHOP);
+    internal::utility::writeData(_boardData, Coord2D('c', 8), ChessPiece::BLACK_BISHOP);
+    internal::utility::writeData(_boardData, Coord2D('f', 8), ChessPiece::BLACK_BISHOP);
 
-ChessBoard::ChessBoard() : 
-    _board(ChessBoard::initRawBoard()), 
-    _whiteLeftCastling(true),
-    _whiteRightCastling(true),
-    _blackLeftCastling(true),
-    _blackRightCastling(true),
-    _whiteEnpassant(std::nullopt),
-    _blackEnpassant(std::nullopt),
-    _whiteKingCoord('e', 1),
-    _blackKingCoord('e', 8) {
+    // initialize kings/queens
+    internal::utility::writeData(_boardData, Coord2D('d', 1), ChessPiece::WHITE_QUEEN);
+    internal::utility::writeData(_boardData, Coord2D('e', 1), ChessPiece::WHITE_KING);
+    internal::utility::writeData(_boardData, Coord2D('d', 8), ChessPiece::BLACK_QUEEN);
+    internal::utility::writeData(_boardData, Coord2D('e', 8), ChessPiece::BLACK_KING);
 
-}
-
-ChessBoard::ChessBoard(
-        std::string board,
-        Coord2D whiteKingCoord,
-        Coord2D blackKingCoord,
-        const bool whiteLeftCastling,
-        const bool whiteRightCastling,
-        const bool blackLeftCastling,
-        const bool blackRightCastling,
-        const std::optional<Coord2D>& whiteEnpassant,
-        const std::optional<Coord2D>& blackEnpassant
-    ) : 
-    _board(std::move(board)),
-    _whiteLeftCastling(whiteLeftCastling),
-    _whiteRightCastling(whiteRightCastling),
-    _blackLeftCastling(blackLeftCastling),
-    _blackRightCastling(blackRightCastling),
-    _whiteEnpassant(whiteEnpassant),
-    _blackEnpassant(blackEnpassant),
-    _whiteKingCoord(whiteKingCoord),
-    _blackKingCoord(blackKingCoord) {
+    // initialize castling rights/en passant square
+    _boardData[32] = (1 << 4) - 1;
+    _boardData[33] = 0;
 
 }
 
-ChessPiece ChessBoard::getPiece(Coord2D coord) const {
-    
-    if (!(coord.row() >= 1 && coord.row() <= 8) && (coord.col() >= 'a' && coord.col() <= 'h')) {
-        throw std::out_of_range("Position on the board must be <a-h><1-8>");
-    }
-
-    int idx = coord.toFlatIdx(); 
-    char p = _board[idx];
-    return ChessPiece(p);
+ChessBoard::ChessBoard() {
+    _initData();
 }
 
-bool ChessBoard::operator==(const ChessBoard& other) const {
-    if (this->_board != other._board) {
-        return false;
-    }
-
-    if (this->_whiteLeftCastling != other._whiteLeftCastling || this->_blackLeftCastling != other._blackLeftCastling) {
-        return false;
-    }
-
-    if (this->_whiteRightCastling != other._whiteRightCastling || this->_blackRightCastling != other._blackRightCastling) {
-        return false;
-    }
-
-    if (this->_whiteEnpassant != other._whiteEnpassant || this->_blackEnpassant != other._blackEnpassant) {
-        return false;
-    }
-
-    return true;
+ChessBoard::ChessBoard(const char* boardData) {
+    std::copy(boardData, boardData + 34, _boardData);
 }
 
 std::string ChessBoard::getWhitePOV() const {

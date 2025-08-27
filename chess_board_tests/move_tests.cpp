@@ -7,6 +7,8 @@
 #include "check_terminal/check.h"
 #include "check_terminal/checkmate.h"
 
+using namespace internal;
+
 class MoveTest : public ::testing::Test {
 protected:
     ChessBoard board = ChessBoard();
@@ -15,23 +17,23 @@ protected:
 };
 
 TEST_F(MoveTest, QueensMoveWhiteRookValid) {
-    std::string rawBoard = board.board();
-    rawBoard[Coord2D('a', 2).toFlatIdx()] = ChessPiece::NONE;
-    rawBoard[Coord2D('h', 2).toFlatIdx()] = ChessPiece::NONE;
-    ChessBoard custom(rawBoard, Coord2D('e', 1), Coord2D('e', 8), true, true, true, true, std::nullopt, std::nullopt);
-    
+    char boardData[34] = { 0 };
+    std::copy(board.boardData(), board.boardData() + 34, boardData);
+    utility::writeData(boardData, Coord2D('a', 2), ChessPiece::NONE);
+    utility::writeData(boardData, Coord2D('h', 2), ChessPiece::NONE);
+    ChessBoard custom(boardData);
 
     QueensMove move1(Color::WHITE, Direction::UP, 2, Coord2D('a', 1));
     auto result1 = move1(custom);
     EXPECT_TRUE(result1.has_value());
     EXPECT_EQ(result1->getPiece(Coord2D('a', 3)), ChessPiece::WHITE_ROOK);
-    EXPECT_FALSE(result1->whiteLeftCastling());
+    EXPECT_FALSE(result1->castling(Color::WHITE, true));
 
     QueensMove move2(Color::WHITE, Direction::UP, 6, Coord2D('h', 1));
     auto result2 = move2(result1.value());
     EXPECT_TRUE(result2.has_value());
     EXPECT_EQ(result2->getPiece(Coord2D('h', 7)), ChessPiece::WHITE_ROOK);
-    EXPECT_FALSE(result2->whiteRightCastling());
+    EXPECT_FALSE(result2->castling(Color::WHITE, false));
 
     QueensMove move3(Color::WHITE, Direction::RIGHT, 4, Coord2D('a', 3));
     auto result3 = move3(result2.value());
@@ -45,29 +47,31 @@ TEST_F(MoveTest, QueensMoveWhiteRookValid) {
 }
 
 TEST_F(MoveTest, QueensMoveBlackRookValid) {
-    std::string rawBoard = board.board();
-    rawBoard[Coord2D('a', 7).toFlatIdx()] = ChessPiece::NONE;
-    rawBoard[Coord2D('h', 7).toFlatIdx()] = ChessPiece::NONE;
-    ChessBoard custom(rawBoard, Coord2D('e', 1), Coord2D('e', 8), true, true, true, true, std::nullopt, std::nullopt);
+    char boardData[34] = { 0 };
+    std::copy(board.boardData(), board.boardData() + 34, boardData);
+    utility::writeData(boardData, Coord2D('a', 7), ChessPiece::NONE);
+    utility::writeData(boardData, Coord2D('h', 7), ChessPiece::NONE);
+    ChessBoard custom(boardData);
     
     QueensMove move(Color::BLACK, Direction::UP, 2, Coord2D('a', 8));
     auto result = move(custom);
     EXPECT_TRUE(result.has_value());
     EXPECT_EQ(result->getPiece(Coord2D('a', 6)), ChessPiece::BLACK_ROOK);
-    EXPECT_FALSE(result->blackRightCastling());
+    EXPECT_FALSE(result->castling(Color::BLACK, false));
 }
 
 TEST_F(MoveTest, QueensMoveWhiteBishopValid) {
-    std::string b = board.board();
-    b[Coord2D('d', 2).toFlatIdx()] = ChessPiece::NONE;
-    b[Coord2D('e', 2).toFlatIdx()] = ChessPiece::NONE;
-    ChessBoard custom(b, board.whiteKingCoord(), board.blackKingCoord(), true, true, true, true, std::nullopt, std::nullopt);
+    char boardData[34] = { 0 };
+    std::copy(board.boardData(), board.boardData() + 34, boardData);
+    utility::writeData(boardData, Coord2D('d', 2), ChessPiece::NONE);
+    utility::writeData(boardData, Coord2D('e', 2), ChessPiece::NONE);
+    ChessBoard custom(boardData);
     QueensMove move(Color::WHITE, Direction::UP_RIGHT, 1, Coord2D('c', 1));
     auto result = move(custom);
     EXPECT_TRUE(result.has_value());
     EXPECT_EQ(result->getPiece(Coord2D('d', 2)), ChessPiece::WHITE_BISHOP);
 
-    ChessBoard custom2(b, board.whiteKingCoord(), board.blackKingCoord(), true, true, true, true, std::nullopt, std::nullopt);
+    ChessBoard custom2(boardData);
     QueensMove move2(Color::WHITE, Direction::UP_LEFT, 3, Coord2D('f', 1));
     auto result2 = move2(custom2);
     EXPECT_TRUE(result2.has_value());
@@ -75,9 +79,10 @@ TEST_F(MoveTest, QueensMoveWhiteBishopValid) {
 }
 
 TEST_F(MoveTest, QueensMoveWhiteQueenCapture) {
-    std::string b = board.board();
-    b[Coord2D('d', 2).toFlatIdx()] = ChessPiece::BLACK_PAWN;
-    ChessBoard custom(b, board.whiteKingCoord(), board.blackKingCoord(), true, true, true, true, std::nullopt, std::nullopt);
+    char boardData[34] = { 0 };
+    std::copy(board.boardData(), board.boardData() + 34, boardData);
+    utility::writeData(boardData, Coord2D('d', 2), ChessPiece::BLACK_PAWN);
+    ChessBoard custom(boardData);
     QueensMove move(Color::WHITE, Direction::UP, 1, Coord2D('d', 1));
     auto result = move(custom);
     EXPECT_TRUE(result.has_value());
@@ -96,9 +101,10 @@ TEST_F(MoveTest, QueensMoveWrongColor) {
 }
 
 TEST_F(MoveTest, QueensMovePawnPromotion) {
-    std::string b = board.board();
-    b[Coord2D('e', 7).toFlatIdx()] = ChessPiece::WHITE_PAWN;
-    ChessBoard custom(b, board.whiteKingCoord(), board.blackKingCoord(), true, true, true, true, std::nullopt, std::nullopt);
+    char boardData[34] = { 0 };
+    std::copy(board.boardData(), board.boardData() + 34, boardData);
+    utility::writeData(boardData, Coord2D('e', 7), ChessPiece::WHITE_PAWN);
+    ChessBoard custom(boardData);
     QueensMove move(Color::WHITE, Direction::UP_RIGHT, 1, Coord2D('e', 7));
     auto result = move(custom);
     EXPECT_TRUE(result.has_value());
@@ -120,9 +126,10 @@ TEST_F(MoveTest, KnightsMoveBlackValid) {
 }
 
 TEST_F(MoveTest, KnightsMoveCapture) {
-    std::string b = board.board();
-    b[Coord2D('c', 3).toFlatIdx()] = ChessPiece::BLACK_PAWN;
-    ChessBoard custom(b, board.whiteKingCoord(), board.blackKingCoord(), true, true, true, true, std::nullopt, std::nullopt);
+    char boardData[34] = { 0 };
+    std::copy(board.boardData(), board.boardData() + 34, boardData);
+    utility::writeData(boardData, Coord2D('c', 3), ChessPiece::BLACK_PAWN);
+    ChessBoard custom(boardData);
     KnightsMove move(Color::WHITE, Vec2D(1, 2), Coord2D('b', 1));
     auto result = move(custom);
     EXPECT_TRUE(result.has_value());
@@ -144,10 +151,11 @@ TEST_F(MoveTest, KnightsMoveInvalidDirectionThrows) {
 }
 
 TEST_F(MoveTest, UnderpromotionWhiteRook) {
-    std::string b = board.board();
-    b[Coord2D('a', 7).toFlatIdx()] = ChessPiece::WHITE_PAWN;
-    b[Coord2D('a', 2).toFlatIdx()] = ChessPiece::NONE;
-    ChessBoard custom(b, board.whiteKingCoord(), board.blackKingCoord(), true, true, true, true, std::nullopt, std::nullopt);
+    char boardData[34] = { 0 };
+    std::copy(board.boardData(), board.boardData() + 34, boardData);
+    utility::writeData(boardData, Coord2D('a', 7), ChessPiece::WHITE_PAWN);
+    utility::writeData(boardData, Coord2D('a', 2), ChessPiece::NONE);
+    ChessBoard custom(boardData);
     Underpromotion move(Color::WHITE, Direction::UP_RIGHT, Coord2D('a', 7), ChessPiece::WHITE_ROOK);
     auto result = move(custom);
     EXPECT_TRUE(result.has_value());
@@ -155,10 +163,11 @@ TEST_F(MoveTest, UnderpromotionWhiteRook) {
 }
 
 TEST_F(MoveTest, UnderpromotionBlackKnight) {
-    std::string b = board.board();
-    b[Coord2D('h', 2).toFlatIdx()] = ChessPiece::BLACK_PAWN;
-    b[Coord2D('h', 1).toFlatIdx()] = ChessPiece::NONE;
-    ChessBoard custom(b, board.whiteKingCoord(), board.blackKingCoord(), true, true, true, true, std::nullopt, std::nullopt);
+    char boardData[34] = { 0 };
+    std::copy(board.boardData(), board.boardData() + 34, boardData);
+    utility::writeData(boardData, Coord2D('h', 2), ChessPiece::BLACK_PAWN);
+    utility::writeData(boardData, Coord2D('h', 1), ChessPiece::NONE);
+    ChessBoard custom(boardData);
     Underpromotion move(Color::BLACK, Direction::UP, Coord2D('h', 2), ChessPiece::BLACK_KNIGHT);
     auto result = move(custom);
     EXPECT_TRUE(result.has_value());
@@ -170,17 +179,19 @@ TEST_F(MoveTest, UnderpromotionInvalidRowThrows) {
 }
 
 TEST_F(MoveTest, UnderpromotionInvalidPieceThrows) {
-    std::string b = board.board();
-    b[Coord2D('a', 7).toFlatIdx()] = ChessPiece::WHITE_PAWN;
-    ChessBoard custom(b, board.whiteKingCoord(), board.blackKingCoord(), true, true, true, true, std::nullopt, std::nullopt);
+    char boardData[34] = { 0 };
+    std::copy(board.boardData(), board.boardData() + 34, boardData);
+    utility::writeData(boardData, Coord2D('a', 7), ChessPiece::WHITE_PAWN);
+    ChessBoard custom(boardData);
     EXPECT_THROW(Underpromotion(Color::WHITE, Direction::UP, Coord2D('a', 7), ChessPiece::BLACK_QUEEN), std::invalid_argument);
 }
 
 TEST_F(MoveTest, CastlingWhiteKingside) {
-    std::string b = board.board();
-    b[Coord2D('f', 1).toFlatIdx()] = ChessPiece::NONE;
-    b[Coord2D('g', 1).toFlatIdx()] = ChessPiece::NONE;
-    ChessBoard custom(b, Coord2D('e', 1), Coord2D('e', 8), true, true, true, true, std::nullopt, std::nullopt);
+    char boardData[34] = { 0 };
+    std::copy(board.boardData(), board.boardData() + 34, boardData);
+    utility::writeData(boardData, Coord2D('f', 1), ChessPiece::NONE);
+    utility::writeData(boardData, Coord2D('g', 1), ChessPiece::NONE);
+    ChessBoard custom(boardData);
     Castling move(Color::WHITE, false);
     auto result = move(custom);
     EXPECT_TRUE(result.has_value());
@@ -188,11 +199,12 @@ TEST_F(MoveTest, CastlingWhiteKingside) {
 }
 
 TEST_F(MoveTest, CastlingWhiteQueenside) {
-    std::string b = board.board();
-    b[Coord2D('b', 1).toFlatIdx()] = ChessPiece::NONE;
-    b[Coord2D('c', 1).toFlatIdx()] = ChessPiece::NONE;
-    b[Coord2D('d', 1).toFlatIdx()] = ChessPiece::NONE;
-    ChessBoard custom(b, Coord2D('e', 1), Coord2D('e', 8), true, true, true, true, std::nullopt, std::nullopt);
+    char boardData[34] = { 0 };
+    std::copy(board.boardData(), board.boardData() + 34, boardData);
+    utility::writeData(boardData, Coord2D('b', 1), ChessPiece::NONE);
+    utility::writeData(boardData, Coord2D('c', 1), ChessPiece::NONE);
+    utility::writeData(boardData, Coord2D('d', 1), ChessPiece::NONE);
+    ChessBoard custom(boardData);
     Castling move(Color::WHITE, true);
     auto result = move(custom);
     EXPECT_TRUE(result.has_value());
@@ -200,10 +212,11 @@ TEST_F(MoveTest, CastlingWhiteQueenside) {
 }
 
 TEST_F(MoveTest, CastlingBlackKingside) {
-    std::string b = board.board();
-    b[Coord2D('f', 8).toFlatIdx()] = ChessPiece::NONE;
-    b[Coord2D('g', 8).toFlatIdx()] = ChessPiece::NONE;
-    ChessBoard custom(b, Coord2D('e', 1), Coord2D('e', 8), true, true, true, true, std::nullopt, std::nullopt);
+    char boardData[34] = { 0 };
+    std::copy(board.boardData(), board.boardData() + 34, boardData);
+    utility::writeData(boardData, Coord2D('f', 8), ChessPiece::NONE);
+    utility::writeData(boardData, Coord2D('g', 8), ChessPiece::NONE);
+    ChessBoard custom(boardData);
     Castling move(Color::BLACK, true);
     auto result = move(custom);
     EXPECT_TRUE(result.has_value());
@@ -211,11 +224,12 @@ TEST_F(MoveTest, CastlingBlackKingside) {
 }
 
 TEST_F(MoveTest, CastlingBlackQueenside) {
-    std::string b = board.board();
-    b[Coord2D('b', 8).toFlatIdx()] = ChessPiece::NONE;
-    b[Coord2D('c', 8).toFlatIdx()] = ChessPiece::NONE;
-    b[Coord2D('d', 8).toFlatIdx()] = ChessPiece::NONE;
-    ChessBoard custom(b, Coord2D('e', 1), Coord2D('e', 8), true, true, true, true, std::nullopt, std::nullopt);
+    char boardData[34] = { 0 };
+    std::copy(board.boardData(), board.boardData() + 34, boardData);
+    utility::writeData(boardData, Coord2D('b', 8), ChessPiece::NONE);
+    utility::writeData(boardData, Coord2D('c', 8), ChessPiece::NONE);
+    utility::writeData(boardData, Coord2D('d', 8), ChessPiece::NONE);
+    ChessBoard custom(boardData);
     Castling move(Color::BLACK, false);
     auto result = move(custom);
     EXPECT_TRUE(result.has_value());
@@ -230,11 +244,13 @@ TEST_F(MoveTest, CastlingBlockedFails) {
 
 TEST_F(MoveTest, EnPassantWhite) {
     // White pawn moves two squares, black pawn captures en passant
-    std::string b = board.board();
-    b[Coord2D('e', 2).toFlatIdx()] = ChessPiece::NONE;
-    b[Coord2D('e', 4).toFlatIdx()] = ChessPiece::WHITE_PAWN;
-    b[Coord2D('d', 4).toFlatIdx()] = ChessPiece::BLACK_PAWN;
-    ChessBoard custom(b, board.whiteKingCoord(), board.blackKingCoord(), true, true, true, true, std::nullopt, Coord2D('e', 3));
+    char boardData[34] = { 0 };
+    std::copy(board.boardData(), board.boardData() + 34, boardData);
+    utility::writeData(boardData, Coord2D('e', 2), ChessPiece::NONE);
+    utility::writeData(boardData, Coord2D('e', 4), ChessPiece::WHITE_PAWN);
+    utility::writeData(boardData, Coord2D('d', 4), ChessPiece::BLACK_PAWN);
+    utility::setEnPassant(boardData, Color::BLACK, Coord2D('e', 3));
+    ChessBoard custom(boardData);
     QueensMove move(Color::BLACK, Direction::UP_LEFT, 1, Coord2D('d', 4));
     auto result = move(custom);
     EXPECT_TRUE(result.has_value());
@@ -244,11 +260,13 @@ TEST_F(MoveTest, EnPassantWhite) {
 
 TEST_F(MoveTest, EnPassantBlack) {
     // Black pawn moves two squares, white pawn captures en passant
-    std::string b = board.board();
-    b[Coord2D('d', 7).toFlatIdx()] = ChessPiece::NONE;
-    b[Coord2D('d', 5).toFlatIdx()] = ChessPiece::BLACK_PAWN;
-    b[Coord2D('e', 5).toFlatIdx()] = ChessPiece::WHITE_PAWN;
-    ChessBoard custom(b, board.whiteKingCoord(), board.blackKingCoord(), true, true, true, true, Coord2D('d', 6), std::nullopt);
+    char boardData[34] = { 0 };
+    std::copy(board.boardData(), board.boardData() + 34, boardData);
+    utility::writeData(boardData, Coord2D('d', 7), ChessPiece::NONE);
+    utility::writeData(boardData, Coord2D('d', 5), ChessPiece::BLACK_PAWN);
+    utility::writeData(boardData, Coord2D('e', 5), ChessPiece::WHITE_PAWN);
+    utility::setEnPassant(boardData, Color::WHITE, Coord2D('d', 6));
+    ChessBoard custom(boardData);
     QueensMove move(Color::WHITE, Direction::UP_LEFT, 1, Coord2D('e', 5));
     auto result = move(custom);
     EXPECT_TRUE(result.has_value());
@@ -257,10 +275,11 @@ TEST_F(MoveTest, EnPassantBlack) {
 }
 
 TEST_F(MoveTest, EnPassantNotAvailable) {
-    std::string b = board.board();
-    b[Coord2D('e', 4).toFlatIdx()] = ChessPiece::WHITE_PAWN;
-    b[Coord2D('d', 4).toFlatIdx()] = ChessPiece::BLACK_PAWN;
-    ChessBoard custom(b, board.whiteKingCoord(), board.blackKingCoord(), true, true, true, true, std::nullopt, std::nullopt);
+    char boardData[34] = { 0 };
+    std::copy(board.boardData(), board.boardData() + 34, boardData);
+    utility::writeData(boardData, Coord2D('e', 4), ChessPiece::WHITE_PAWN);
+    utility::writeData(boardData, Coord2D('d', 4), ChessPiece::BLACK_PAWN);
+    ChessBoard custom(boardData);
     QueensMove move(Color::BLACK, Direction::UP_RIGHT, 1, Coord2D('d', 4));
     auto result = move(custom);
     EXPECT_FALSE(result.has_value());
@@ -305,36 +324,13 @@ TEST(GetAllMoves, InitialPositionBlack) {
     }
 }
 
-TEST(GetAllMoves, EmptyBoard) {
-    ChessBoard board(
-        std::string(64, ChessPiece::NONE),
-        Coord2D('e', 1), Coord2D('e', 8),
-        false, false, false, false, std::nullopt, std::nullopt
-    );
-    auto moves = getAllMoves(board, Color::WHITE, true);
-    EXPECT_EQ(moves.size(), 0);
-
-    // ensure all moves lead to a valid state
-    for (const auto& move : moves) {
-        auto newState = (*move)(board);
-        ASSERT_TRUE(newState.has_value());
-        EXPECT_TRUE(CheckTerminal::kingIsChecked(newState.value(), Color::WHITE).empty());
-    }
-}
-
 TEST(GetAllMoves, OnlyKing) {
-    ChessBoard board(
-        std::string(64, ChessPiece::NONE),
-        Coord2D('e', 1), Coord2D('e', 8),
-        false, false, false, false, std::nullopt, std::nullopt
-    );
-    // Place white king at E1
-    std::string raw = board.board();
-    raw[Coord2D('e', 1).toFlatIdx()] = ChessPiece::WHITE_KING;
-    ChessBoard kingBoard(
-        raw, Coord2D('e', 1), Coord2D('e', 8),
-        false, false, false, false, std::nullopt, std::nullopt
-    );
+
+    char boardData[34] = { 0 };
+    utility::writeData(boardData, Coord2D('e', 1), ChessPiece::WHITE_KING);
+    utility::writeData(boardData, Coord2D('e', 8), ChessPiece::BLACK_KING);
+
+    ChessBoard kingBoard(boardData);
     auto moves = getAllMoves(kingBoard, Color::WHITE, true);
     // King at E1 has 5 possible moves (D1, D2, E2, F1, F2) but only those on board
     EXPECT_EQ(moves.size(), 5);
@@ -343,106 +339,97 @@ TEST(GetAllMoves, OnlyKing) {
     // ensure all moves lead to a valid state
     for (const auto& move : moves) {
         auto newState = (*move)(kingBoard);
-        ASSERT_TRUE(newState.has_value()) << board.getWhitePOV();
+        ASSERT_TRUE(newState.has_value());
         EXPECT_TRUE(CheckTerminal::kingIsChecked(newState.value(), Color::WHITE).empty());
     }
 }
 
 TEST(GetAllMoves, PawnPromotionMoves) {
-    std::string raw(64, ChessPiece::NONE);
-    raw[Coord2D('a', 7).toFlatIdx()] = ChessPiece::WHITE_PAWN;
-    ChessBoard board(
-        raw, Coord2D('e', 1), Coord2D('e', 8),
-        false, false, false, false, std::nullopt, std::nullopt
-    );
+    char boardData[34] = { 0 };
+    utility::writeData(boardData, Coord2D('a', 7), ChessPiece::WHITE_PAWN);
+    utility::writeData(boardData, Coord2D('e', 1), ChessPiece::WHITE_KING);
+    utility::writeData(boardData, Coord2D('e', 8), ChessPiece::BLACK_KING);
+    ChessBoard board(boardData);
     auto moves = getAllMoves(board, Color::WHITE, false);
     // Pawn at A7 can move to A8 (promotion), or capture at B8 if enemy present
-    EXPECT_GE(moves.size(), 4);
+    EXPECT_GE(moves.size(), 9);
 
-    raw[Coord2D('b', 8).toFlatIdx()] = ChessPiece::BLACK_KNIGHT;
-    ChessBoard boardWithCapture(
-        raw, Coord2D('e', 1), Coord2D('e', 8),
-        false, false, false, false, std::nullopt, std::nullopt
-    );
+    utility::writeData(boardData, Coord2D('b', 8), ChessPiece::BLACK_KNIGHT);
+    ChessBoard boardWithCapture(boardData);
     auto captureMoves = getAllMoves(boardWithCapture, Color::WHITE, false);
     // Now pawn can capture at B8
-    EXPECT_GE(captureMoves.size(), 8);
+    EXPECT_GE(captureMoves.size(), 13);
 }
 
 TEST(GetAllMoves, BlockedPawn) {
-    std::string raw(64, ChessPiece::NONE);
-    raw[Coord2D('a', 2).toFlatIdx()] = ChessPiece::WHITE_PAWN;
-    raw[Coord2D('a', 3).toFlatIdx()] = ChessPiece::BLACK_PAWN;
-    ChessBoard board(
-        raw, Coord2D('e', 1), Coord2D('e', 8),
-        false, false, false, false, std::nullopt, std::nullopt
-    );
+    char boardData[34] = { 0 };
+    utility::writeData(boardData, Coord2D('a', 2), ChessPiece::WHITE_PAWN);
+    utility::writeData(boardData, Coord2D('a', 3), ChessPiece::BLACK_PAWN);
+    utility::writeData(boardData, Coord2D('e', 1), ChessPiece::WHITE_KING);
+    utility::writeData(boardData, Coord2D('e', 8), ChessPiece::BLACK_KING);
+    ChessBoard board(boardData);
     auto moves = getAllMoves(board, Color::WHITE, false);
     // Pawn is blocked, should have no moves
-    EXPECT_EQ(moves.size(), 0) << board.getWhitePOV();
+    EXPECT_EQ(moves.size(), 5) << board.getWhitePOV();
 }
 
 TEST(GetAllMoves, PawnEnPassant) {
-    std::string raw(64, ChessPiece::NONE);
-    raw[Coord2D('e', 4).toFlatIdx()] = ChessPiece::WHITE_PAWN;
-    raw[Coord2D('d', 4).toFlatIdx()] = ChessPiece::BLACK_PAWN;
-    ChessBoard board(
-        raw, Coord2D('e', 1), Coord2D('e', 8),
-        false, false, false, false, std::nullopt, Coord2D('e', 3)
-    );
+    char boardData[34] = { 0 };
+    utility::writeData(boardData, Coord2D('e', 4), ChessPiece::WHITE_PAWN);
+    utility::writeData(boardData, Coord2D('d', 4), ChessPiece::BLACK_PAWN);
+    utility::writeData(boardData, Coord2D('e', 1), ChessPiece::WHITE_KING);
+    utility::writeData(boardData, Coord2D('e', 8), ChessPiece::BLACK_KING);
+    utility::setEnPassant(boardData, Color::BLACK, Coord2D('e', 3));
+    ChessBoard board(boardData);
     auto moves = getAllMoves(board, Color::BLACK, false);
     // Pawn at E4 can capture en passant at D3
-    EXPECT_EQ(moves.size(), 2);
-    EXPECT_EQ(CountMoveType<QueensMove>(moves), 2);
+    EXPECT_EQ(moves.size(), 7);
+    EXPECT_EQ(CountMoveType<QueensMove>(moves), 7);
 }
 
 TEST(GetAllMoves, KnightJumpOverPieces) {
-    std::string raw(64, ChessPiece::NONE);
-    raw[Coord2D('b', 1).toFlatIdx()] = ChessPiece::WHITE_KNIGHT;
-    raw[Coord2D('b', 2).toFlatIdx()] = ChessPiece::WHITE_PAWN;
-    raw[Coord2D('c', 3).toFlatIdx()] = ChessPiece::BLACK_PAWN;
-    ChessBoard board(
-        raw, Coord2D('e', 1), Coord2D('e', 8),
-        false, false, false, false, std::nullopt, std::nullopt
-    );
+    char boardData[34] = { 0 };
+    utility::writeData(boardData, Coord2D('b', 1), ChessPiece::WHITE_KNIGHT);
+    utility::writeData(boardData, Coord2D('b', 2), ChessPiece::WHITE_PAWN);
+    utility::writeData(boardData, Coord2D('c', 3), ChessPiece::BLACK_PAWN);
+    utility::writeData(boardData, Coord2D('e', 1), ChessPiece::WHITE_KING);
+    utility::writeData(boardData, Coord2D('e', 8), ChessPiece::BLACK_KING);
+    ChessBoard board(boardData);
     auto moves = getAllMoves(board, Color::WHITE, false);
     // Knight at B1 should have 2 moves: A3, C3 (C3 is a capture)
-    EXPECT_EQ(moves.size(), 6) << board.getWhitePOV();
+    EXPECT_EQ(moves.size(), 11) << board.getWhitePOV();
     EXPECT_EQ(CountMoveType<KnightsMove>(moves), 3);
 }
 
 TEST(GetAllMoves, RookMoves) {
-    std::string raw(64, ChessPiece::NONE);
-    raw[Coord2D('d', 4).toFlatIdx()] = ChessPiece::WHITE_ROOK;
-    ChessBoard board(
-        raw, Coord2D('e', 1), Coord2D('e', 8),
-        false, false, false, false, std::nullopt, std::nullopt
-    );
+    char boardData[34] = { 0 };
+    utility::writeData(boardData, Coord2D('d', 4), ChessPiece::WHITE_ROOK);
+    utility::writeData(boardData, Coord2D('e', 1), ChessPiece::WHITE_KING);
+    utility::writeData(boardData, Coord2D('e', 8), ChessPiece::BLACK_KING);
+    ChessBoard board(boardData);
     auto moves = getAllMoves(board, Color::WHITE, false);
     // Rook at D4 should have 14 moves (7 up, 7 down, 3 left, 4 right)
-    EXPECT_EQ(moves.size(), 14);
+    EXPECT_EQ(moves.size(), 19);
 }
 
 TEST(GetAllMoves, BishopMoves) {
-    std::string raw(64, ChessPiece::NONE);
-    raw[Coord2D('c', 1).toFlatIdx()] = ChessPiece::WHITE_BISHOP;
-    ChessBoard board(
-        raw, Coord2D('e', 1), Coord2D('e', 8),
-        false, false, false, false, std::nullopt, std::nullopt
-    );
+    char boardData[34] = { 0 };
+    utility::writeData(boardData, Coord2D('c', 1), ChessPiece::WHITE_BISHOP);
+    utility::writeData(boardData, Coord2D('e', 1), ChessPiece::WHITE_KING);
+    utility::writeData(boardData, Coord2D('e', 8), ChessPiece::BLACK_KING);
+    ChessBoard board(boardData);
     auto moves = getAllMoves(board, Color::WHITE, false);
     // Bishop at C1 should have 7 moves (diagonals)
-    EXPECT_EQ(moves.size(), 7);
+    EXPECT_EQ(moves.size(), 12);
 }
 
 TEST(GetAllMoves, QueenMoves) {
-    std::string raw(64, ChessPiece::NONE);
-    raw[Coord2D('d', 4).toFlatIdx()] = ChessPiece::WHITE_QUEEN;
-    ChessBoard board(
-        raw, Coord2D('e', 1), Coord2D('e', 8),
-        false, false, false, false, std::nullopt, std::nullopt
-    );
+    char boardData[34] = { 0 };
+    utility::writeData(boardData, Coord2D('d', 4), ChessPiece::WHITE_QUEEN);
+    utility::writeData(boardData, Coord2D('e', 1), ChessPiece::WHITE_KING);
+    utility::writeData(boardData, Coord2D('e', 8), ChessPiece::BLACK_KING);
+    ChessBoard board(boardData);
     auto moves = getAllMoves(board, Color::WHITE, false);
     // Queen at D4 should have 27 moves (rook + bishop moves)
-    EXPECT_EQ(moves.size(), 27);
+    EXPECT_EQ(moves.size(), 32);
 }

@@ -53,10 +53,20 @@ std::vector<std::shared_ptr<ChessMove>> getAllMoves(
         
         bool isWhiteTurn = turn == Color::WHITE;
         
-        bool leftCastling = (isWhiteTurn && board.whiteLeftCastling()) || (!isWhiteTurn && board.blackLeftCastling());
-        bool rightCastling = (isWhiteTurn && board.whiteRightCastling()) || (!isWhiteTurn && board.blackRightCastling());
+        bool leftCastling = board.castling(turn, true);
+        bool rightCastling = board.castling(turn, false);
         
-        Coord2D kingCoord = isWhiteTurn ? board.whiteKingCoord() : board.blackKingCoord();
+        Coord2D kingCoord;
+        for (char col = 'a'; col <= 'h'; ++col) {
+            for (int8_t row = 1; row <= 8; ++row) {
+                Coord2D coord(col, row);
+                ChessPiece piece = board.getPiece(coord); 
+                if (piece.isKing() && piece.color() == turn) {
+                    kingCoord = coord; break;
+                }
+            }
+        }
+
         ChessPiece rook = isWhiteTurn ? ChessPiece::WHITE_ROOK : ChessPiece::BLACK_ROOK; 
 
         if (leftCastling) {

@@ -1,5 +1,8 @@
 #include "castling.h"
 #include "../check_terminal/check.h"
+#include "../utility.h"
+
+#include <cstring>
 
 /**
  * @brief Construct for the Castling's move
@@ -19,12 +22,7 @@ Castling::Castling(Color color, bool isLeft) noexcept :
  */
 std::optional<ChessBoard> Castling::operator()(const ChessBoard& state) const {
     // check if castling is allowed in the first place 
-    if (_color == Color::WHITE) {
-        if ((_isLeft && !state.whiteLeftCastling()) || (!_isLeft && !state.whiteRightCastling())) {
-            return std::nullopt;
-        }
-    }
-    if ((_isLeft && !state.blackLeftCastling()) || (!_isLeft && !state.blackRightCastling())) {
+    if (!state.castling(_color, _isLeft)) {
         return std::nullopt;
     }
 
@@ -44,64 +42,33 @@ std::optional<ChessBoard> Castling::operator()(const ChessBoard& state) const {
     Coord2D rookPos = Coord2D(rookCol, row);
     Coord2D kingPos = Coord2D('e', row);
 
-    // get raw board 
-    std::string rawBoard = state.board();
-
     // check if there are any pieces between the king and the rook
     for (Coord2D iter = rookPos + mv; iter != kingPos; iter = iter + mv) {
         // there exists a piece in between -> castling is impossible
-        if (rawBoard[iter.toFlatIdx()] != ChessPiece::NONE) {
+        if (!state.getPiece(iter).isNone()) {
             return std::nullopt;
         }
     }
 
-    // update en passant square
-    std::optional<Coord2D> whiteEnpassant = std::nullopt, blackEnpassant = std::nullopt;
+    // get raw board 
+    char boardData[34] = { 0 };
+    std::copy(state.boardData(), state.boardData() + 34, boardData);
+    
+    // disable castling for the move 
+    internal::utility::turnOffCastling(boardData, _color, _isLeft);
 
-    // update castling rights
-    bool newWhiteLeftCastling = state.whiteLeftCastling(), 
-    newWhiteRightCastling = state.whiteRightCastling(), 
-    newBlackLeftCastling  = state.blackLeftCastling(), 
-    newBlackRightCastling = state.blackRightCastling();
-    
-    if (_color == Color::WHITE) {
-        if (_isLeft) newWhiteLeftCastling = false;
-        else newWhiteRightCastling = false;
-    }
-    else {
-        if (_isLeft) newBlackLeftCastling = false;
-        else newBlackRightCastling = false;
-    }
-    
     // perform transformation
-    Piece_t king = rawBoard[kingPos.toFlatIdx()], rook = rawBoard[rookPos.toFlatIdx()];
-    
     Vec2D kingMv = mv * -2;
     Coord2D newKingPos = kingPos + kingMv;
 
-    rawBoard[kingPos.toFlatIdx()] = ChessPiece::NONE;
-    rawBoard[newKingPos.toFlatIdx()] = king;
+    internal::utility::writeData(boardData, kingPos, ChessPiece::NONE);
+    internal::utility::writeData(boardData, newKingPos, state.getPiece(kingPos));
 
-    rawBoard[rookPos.toFlatIdx()] = ChessPiece::NONE;
-    rawBoard[(newKingPos + mv).toFlatIdx()] = rook;
+    internal::utility::writeData(boardData, rookPos, ChessPiece::NONE);
+    internal::utility::writeData(boardData, newKingPos + mv, state.getPiece(rookPos));
 
-    Coord2D newWhiteKingCoord = state.whiteKingCoord(), newBlackKingCoord = state.blackKingCoord();
+    // disable en passant 
+    internal::utility::turnOffEnpassant(boardData);
 
-    if (_color == Color::WHITE) {
-        newWhiteKingCoord = newKingPos;
-    } else {
-        newBlackKingCoord = newKingPos;
-    }
-
-    return ChessBoard(
-        rawBoard, 
-        newWhiteKingCoord,
-        newBlackKingCoord,
-        newWhiteLeftCastling, 
-        newWhiteRightCastling, 
-        newBlackLeftCastling, 
-        newBlackRightCastling, 
-        whiteEnpassant, 
-        blackEnpassant
-    );
+    return ChessBoard(boardData);
 }
