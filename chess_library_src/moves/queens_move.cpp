@@ -1,4 +1,5 @@
 #include "queens_move.h"
+#include "../utility.h"
 
 #include <stdexcept>
 
@@ -55,7 +56,8 @@ std::optional<ChessBoard> QueensMove::operator()(const ChessBoard& state) const 
     }
 
     // get raw board 
-    std::string rawBoard = state.board();
+    char boardData[34] = { 0 };
+    std::copy(state.boardData(), state.boardData() + 34, boardData);
 
     // get the move transformation and the destination square
     Vec2D singleMv = vecMap[_direction] * (_color == Color::WHITE ? 1 : -1), mv = singleMv * _numSteps;
@@ -74,16 +76,6 @@ std::optional<ChessBoard> QueensMove::operator()(const ChessBoard& state) const 
         }
     }
     
-    Coord2D newWhiteKingCoord = state.whiteKingCoord(), newBlackKingCoord = state.blackKingCoord();
-    
-    // keep track of enpassant/castling
-    bool newWhiteLeftCastling = state.whiteLeftCastling(), 
-    newWhiteRightCastling = state.whiteRightCastling(), 
-    newBlackLeftCastling  = state.blackLeftCastling(), 
-    newBlackRightCastling = state.blackRightCastling();
-    
-    std::optional<Coord2D> newWhiteEnpassant = std::nullopt, newBlackEnpassant = std::nullopt;
-    
     // only applies to pawn; end of row arrival -> queen promotion
     ChessPiece promote = state.getPiece(_origin);
     
@@ -98,8 +90,8 @@ std::optional<ChessBoard> QueensMove::operator()(const ChessBoard& state) const 
         if (_direction == Direction::UP_LEFT || _direction == Direction::UP_RIGHT) {
             if (_numSteps != 1) return std::nullopt;
             
-            bool isEnpassant = (_color == Color::WHITE && state.whiteEnpassant().has_value() && dest == state.whiteEnpassant().value()) || 
-                                (_color == Color::BLACK && state.blackEnpassant().has_value() && dest == state.blackEnpassant().value());
+            std::optional<Coord2D> enPassant = state.enpassant(_color);
+            bool isEnpassant = enPassant == dest;
 
             // diagonal move may only be performed to capture pieces/enpassant
             if (state.getPiece(dest).isNone() && !isEnpassant) return std::nullopt;
@@ -107,7 +99,7 @@ std::optional<ChessBoard> QueensMove::operator()(const ChessBoard& state) const 
             // enpassant requires the capture of the pawn in the corresponding square 
             if (isEnpassant) {
                 Coord2D capturedPawn = dest + ((_color == Color::WHITE) ? Vec2D(0, -1) : Vec2D(0, 1)); 
-                rawBoard[capturedPawn.toFlatIdx()] = ChessPiece::NONE;
+                internal::utility::writeData(boardData, capturedPawn, ChessPiece::NONE);
             }
         }
         
@@ -127,7 +119,7 @@ std::optional<ChessBoard> QueensMove::operator()(const ChessBoard& state) const 
                 if ((_color == Color::WHITE && _origin.row() != 2) || (_color == Color::BLACK && _origin.row() != 7)) return std::nullopt;
                 
                 // a 2-block jump will make the pawn liable to enpassant
-                _color == Color::WHITE ? newBlackEnpassant = occupiedCheck : newWhiteEnpassant = occupiedCheck;
+                internal::utility::setEnPassant(boardData, ~_color, occupiedCheck);
             }
             
             // pawn moving forward may not be possible if another piece is in front of it 
@@ -151,12 +143,16 @@ std::optional<ChessBoard> QueensMove::operator()(const ChessBoard& state) const 
         
         // rook's move may forfeit castling rights 
         if (_color == Color::WHITE) {
-            if (newWhiteLeftCastling && _origin == Coord2D('a', 1)) newWhiteLeftCastling = false;
-            else if (newWhiteRightCastling &&  _origin == Coord2D('h', 1)) newWhiteRightCastling = false;
+            if (state.castling(_color, true) && _origin == Coord2D('a', 1)) 
+                internal::utility::turnOffCastling(boardData, _color, true);
+            else if (state.castling(_color, false) &&  _origin == Coord2D('h', 1)) 
+                internal::utility::turnOffCastling(boardData, _color, false);;
         }
         else {
-            if (newBlackLeftCastling && _origin == Coord2D('h', 8)) newBlackLeftCastling = false;
-            else if (newBlackRightCastling && _origin == Coord2D('a', 8)) newBlackRightCastling = false;
+            if (state.castling(_color, true) && _origin == Coord2D('h', 8)) 
+                internal::utility::turnOffCastling(boardData, _color, true);
+            else if (state.castling(_color, false) && _origin == Coord2D('a', 8)) 
+                internal::utility::turnOffCastling(boardData, _color, false);
         }
     }
 
@@ -176,34 +172,18 @@ std::optional<ChessBoard> QueensMove::operator()(const ChessBoard& state) const 
         if (_numSteps > 1) return std::nullopt;
         
         // performing king's movement may forfeit castling rights
-        if (_color == Color::WHITE) {
-            newWhiteKingCoord = dest;
-            newWhiteLeftCastling = newWhiteRightCastling = false;
-        }
-        else {
-            newBlackKingCoord = dest;
-            newBlackLeftCastling = newBlackRightCastling = false;
-        }
+        internal::utility::turnOffCastling(boardData, _color, true);
+        internal::utility::turnOffCastling(boardData, _color, false);
     }
 
     // queen's move is by default
 
     // update castling rights of opponent
-    updateCastling(state, _color, dest, newWhiteLeftCastling, newWhiteRightCastling, newBlackLeftCastling, newBlackRightCastling);
+    updateCastling(state, _color, dest, boardData);
 
     // perform transformation 
-    rawBoard[_origin.toFlatIdx()] = ChessPiece::NONE;
-    rawBoard[dest.toFlatIdx()] = promote;
+    internal::utility::writeData(boardData, _origin, ChessPiece::NONE);
+    internal::utility::writeData(boardData, dest, promote);
 
-    return ChessBoard(
-        rawBoard, 
-        newWhiteKingCoord,
-        newBlackKingCoord,
-        newWhiteLeftCastling, 
-        newWhiteRightCastling, 
-        newBlackLeftCastling, 
-        newBlackRightCastling, 
-        newWhiteEnpassant, 
-        newBlackEnpassant
-    ); 
+    return ChessBoard(boardData); 
 }

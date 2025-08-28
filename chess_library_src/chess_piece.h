@@ -1,6 +1,6 @@
 #pragma once
 
-typedef char Piece_t;
+typedef uint8_t Piece_t;
 
 #include <stdexcept>
 
@@ -30,8 +30,8 @@ private:
 
 class ChessPiece {
 public:
-    enum Piece : char {
-        NONE = 1,
+    enum Piece : Piece_t {
+        NONE = 0,
         WHITE_PAWN, 
         WHITE_ROOK, 
         WHITE_KNIGHT, 

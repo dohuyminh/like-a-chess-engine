@@ -8,6 +8,7 @@ target_sources(
         ${CMAKE_CURRENT_LIST_DIR}/chess_board.cpp
         ${CMAKE_CURRENT_LIST_DIR}/coord2D.h
         ${CMAKE_CURRENT_LIST_DIR}/coord2D.cpp 
+        ${CMAKE_CURRENT_LIST_DIR}/utility.h
         ${CMAKE_CURRENT_LIST_DIR}/square_iterator/reachability.h
         ${CMAKE_CURRENT_LIST_DIR}/square_iterator/r_bishop.h
         ${CMAKE_CURRENT_LIST_DIR}/square_iterator/r_bishop.cpp 

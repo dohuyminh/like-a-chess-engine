@@ -1,6 +1,8 @@
 #include "underpromotion.h"
+#include "../utility.h"
 
 #include <stdexcept>
+#include <cstring>
 
 /**
  * @brief Construct for the Underpromotion's move 
@@ -74,7 +76,8 @@ std::optional<ChessBoard> Underpromotion::operator()(const ChessBoard& state) co
     }
 
     // get raw board 
-    std::string rawBoard = state.board();
+    char boardData[34] = { 0 };
+    std::copy(state.boardData(), state.boardData() + 34, boardData);
 
     // get direction and new piece position after transformation
     Vec2D dir = vecMap[_direction];
@@ -100,31 +103,14 @@ std::optional<ChessBoard> Underpromotion::operator()(const ChessBoard& state) co
         return std::nullopt;
     }
 
-    // update en passant square (since a pawn is moving at the 2nd last row, there shall be no en passant square left)
-    constexpr std::optional<Coord2D> whiteEnpassant = std::nullopt;
-    constexpr std::optional<Coord2D> blackEnpassant = std::nullopt;
-
-    // update castling square 
-    bool newWhiteLeftCastling = state.whiteLeftCastling(), 
-        newWhiteRightCastling = state.whiteRightCastling(), 
-        newBlackLeftCastling  = state.blackLeftCastling(),
-        newBlackRightCastling = state.blackRightCastling();
-
-    updateCastling(state, _color, dest, newWhiteLeftCastling, newWhiteRightCastling, newBlackLeftCastling, newBlackRightCastling);
+    // update castling + en passant 
+    updateCastling(state, _color, dest, boardData);
+    internal::utility::turnOffEnpassant(boardData);
 
     uint8_t originIdx = _origin.toFlatIdx(), destIdx = dest.toFlatIdx();
     // perform transformation on raw board 
-    rawBoard[originIdx] = ChessPiece::NONE;
-    rawBoard[destIdx] = _promotePiece;
+    internal::utility::writeData(boardData, _origin, ChessPiece::NONE);
+    internal::utility::writeData(boardData, dest, _promotePiece);
 
-    return ChessBoard(
-        rawBoard, 
-        state.whiteKingCoord(),
-        state.blackKingCoord(),
-        newWhiteLeftCastling, 
-        newWhiteRightCastling, 
-        newBlackLeftCastling, 
-        newBlackRightCastling, 
-        whiteEnpassant, 
-        blackEnpassant);
+    return ChessBoard(boardData);
 }

@@ -1,4 +1,5 @@
 #include "knights_move.h"
+#include "../utility.h"
 
 #include <stdexcept>
 
@@ -60,51 +61,26 @@ std::optional<ChessBoard> KnightsMove::operator()(const ChessBoard& state) const
     }
             
     // get new point
-    Coord2D newPoint = _origin + _direction;
-
+    Coord2D dest = _origin + _direction;
 
     // check if the position is valid (i.e. knights cannot capture pieces of the same color)
-    if (piece.color() == state.getPiece(newPoint).color()) {
+    if (piece.color() == state.getPiece(dest).color()) {
 
         return std::nullopt;
     }
-        
-    // update enpassant squares (since the knight has moved, the opponent's enpassant square is invalidated)
-    // since in this turn, a knight moves, there will not be any enpassant square for the home player
-    std::optional<Coord2D> newWhiteEnpassant = std::nullopt;
-    std::optional<Coord2D> newBlackEnpassant = std::nullopt; 
-    
-    // update castling rights
-    bool newWhiteLeftCastling = state.whiteLeftCastling(),
-        newWhiteRightCastling = state.whiteRightCastling(), 
-        newBlackLeftCastling  = state.blackLeftCastling(), 
-        newBlackRightCastling = state.blackRightCastling();
-    
-    // update castling
-    updateCastling(state, _color, newPoint, newWhiteLeftCastling, newWhiteRightCastling, newBlackLeftCastling, newBlackRightCastling);
 
     // get the raw board
-    std::string rawBoard = state.board();
-
-    const uint8_t originIdx = _origin.toFlatIdx();
-    // move
-    const uint8_t destIdx = newPoint.toFlatIdx();
-
+    char boardData[34] = { 0 };
+    std::copy(state.boardData(), state.boardData() + 34, boardData);
 
     // transform the raw board 
-    rawBoard[originIdx] = static_cast<char>(ChessPiece::NONE);
-    rawBoard[destIdx] = piece;
+    internal::utility::writeData(boardData, _origin, ChessPiece::NONE);
+    internal::utility::writeData(boardData, dest, piece);
+    
+    // update castling + en passant
+    updateCastling(state, _color, dest, boardData);
+    internal::utility::turnOffEnpassant(boardData);
 
     // return final state 
-    return ChessBoard(
-        rawBoard, 
-        state.whiteKingCoord(),
-        state.blackKingCoord(),
-        newWhiteLeftCastling, 
-        newWhiteRightCastling, 
-        newBlackLeftCastling, 
-        newBlackRightCastling, 
-        newWhiteEnpassant, 
-        newBlackEnpassant
-    ); 
+    return ChessBoard(boardData); 
 }

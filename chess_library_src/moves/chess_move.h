@@ -15,10 +15,7 @@ protected:
         const ChessBoard& state, 
         Color turn,
         Coord2D newPoint, 
-        bool& newWhiteLeftCastling, 
-        bool& newWhiteRightCastling, 
-        bool& newBlackLeftCastling, 
-        bool& newBlackRightCastling);
+        char* boardData);
             
     Color _color;
         

@@ -11,7 +11,7 @@ std::vector<Coord2D> RPawn::pieceCanReachSquare(const ChessBoard& state, Coord2D
 
     // determine the color of the piece 
     bool originPieceIsWhite = pieceAtOrigin.isWhite(); 
-    const std::optional<Coord2D>& enPassant = originPieceIsWhite ? state.whiteEnpassant() : state.blackEnpassant();
+    const std::optional<Coord2D>& enPassant = state.enpassant(pieceAtOrigin.color());
 
     // check if it can move forward 1/2 squares 
     Vec2D forward = originPieceIsWhite ? Vec2D(0, 1) : Vec2D(0, -1);

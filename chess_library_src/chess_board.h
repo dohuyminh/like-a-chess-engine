@@ -2,13 +2,17 @@
 
 #include "coord2D.h"
 #include "chess_piece.h"
+#include "utility.h"
 
 #include <cstddef>
+#include <cstring>
 #include <functional>
 #include <string>
 #include <optional>
 #include <unordered_set>
 #include <vector>
+
+#include <iostream>
 
 /**
  * @brief A representation of the current chess board state. 
@@ -21,82 +25,37 @@ public:
     
     ChessBoard();
 
-    ChessBoard(
-        std::string board,
-        Coord2D whiteKingCoord,
-        Coord2D blackKingCoord,
-        bool whiteLeftCastling,
-        bool whiteRightCastling,
-        bool blackLeftCastling,
-        bool blackRightCastling,
-        const std::optional<Coord2D>& whiteEnpassant, 
-        const std::optional<Coord2D>& blackEnpassant
-    );
+    ChessBoard(const char* boardData);
 
-    [[nodiscard]] inline const std::string& board() const {
-        return _board;
+    [[nodiscard]] inline const char* boardData() const {
+        return _boardData;
     }
     
-    [[nodiscard]] inline bool whiteLeftCastling() const {
-        return _whiteLeftCastling;
+    [[nodiscard]] inline bool castling(Color color, bool isQueenside) const {
+        return internal::utility::getCastling(_boardData, color, isQueenside);
+    } 
+
+    [[nodiscard]] inline std::optional<Coord2D> enpassant(Color color) const {
+        return internal::utility::getEnPassant(_boardData, color);
     }
 
-     [[nodiscard]] inline bool blackLeftCastling() const {
-        return _blackLeftCastling;
+    [[nodiscard]] inline ChessPiece getPiece(Coord2D coord) const {
+        return internal::utility::getData(_boardData, coord);
     }
 
-     [[nodiscard]] inline bool whiteRightCastling() const {
-        return _whiteRightCastling;
+    inline bool operator==(const ChessBoard& other) const {
+        return memcmp(_boardData, other.boardData(), 34) == 0;
     }
 
-     [[nodiscard]] inline bool blackRightCastling() const {
-        return _blackRightCastling;
-    }
-
-     [[nodiscard]] inline const std::optional<Coord2D>& whiteEnpassant() const {
-        return _whiteEnpassant;
-    }
-
-     [[nodiscard]] inline const std::optional<Coord2D>& blackEnpassant() const {
-        return _blackEnpassant;
-    }
-
-    [[nodiscard]] inline const Coord2D& whiteKingCoord() const {
-        return _whiteKingCoord;
-    }
-
-     [[nodiscard]] inline const Coord2D& blackKingCoord() const {
-        return _blackKingCoord;
-    }
-
-    [[nodiscard]] ChessPiece getPiece(Coord2D coord) const;
-    bool operator==(const ChessBoard& other) const;
     [[nodiscard]] std::string getWhitePOV() const;
     [[nodiscard]] std::string getBlackPOV() const;
     
 private:
     
-    static std::string initRawBoard();
+    void _initData();
 
     // raw board representation
-    std::string _board;
-
-    // specify the king's coordinates
-    Coord2D _whiteKingCoord;
-    Coord2D _blackKingCoord;
-
-    // specify whether the white player can perform castling
-    bool _whiteLeftCastling;
-    bool _whiteRightCastling;
-
-    // specify whether the black player can perform castling
-    bool _blackLeftCastling;
-    bool _blackRightCastling;
-
-    // specify which pawn just performed a 2-square advance; said
-    // pawn is susceptible to en passant 
-    std::optional<Coord2D> _whiteEnpassant;
-    std::optional<Coord2D> _blackEnpassant;
+    char _boardData[34] = { 0 };
 
 };
 
@@ -105,15 +64,7 @@ struct std::hash<ChessBoard> {
 
     std::size_t operator()(const ChessBoard& board) const noexcept {
         std::hash<std::string> rawBoardHasher;
-        std::size_t hRawBoard = rawBoardHasher(board.board());
-
-        hRawBoard <<=     (board.whiteLeftCastling());
-        hRawBoard <<= 2 * (board.blackLeftCastling());
-        hRawBoard <<= 3 * (board.whiteEnpassant().has_value());
-        hRawBoard <<= 4 * (board.blackEnpassant().has_value());
-        hRawBoard <<= 5 * (board.whiteRightCastling());
-        hRawBoard <<= 6 * (board.blackRightCastling());
-
+        std::size_t hRawBoard = rawBoardHasher(std::string(board.boardData(), board.boardData() + 34));
         return hRawBoard;
     }
 
