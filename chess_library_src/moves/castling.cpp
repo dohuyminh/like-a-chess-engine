@@ -3,6 +3,7 @@
 #include "../utility.h"
 
 #include <cstring>
+#include <optional>
 
 /**
  * @brief Construct for the Castling's move
@@ -55,7 +56,8 @@ std::optional<ChessBoard> Castling::operator()(const ChessBoard& state) const {
     std::copy(state.boardData(), state.boardData() + 34, boardData);
     
     // disable castling for the move 
-    internal::utility::turnOffCastling(boardData, _color, _isLeft);
+    internal::utility::turnOffCastling(boardData, _color, true);
+    internal::utility::turnOffCastling(boardData, _color, false);
 
     // perform transformation
     Vec2D kingMv = mv * -2;

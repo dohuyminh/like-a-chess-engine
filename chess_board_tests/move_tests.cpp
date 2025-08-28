@@ -242,6 +242,24 @@ TEST_F(MoveTest, CastlingBlockedFails) {
     EXPECT_FALSE(result.has_value());
 }
 
+TEST_F(MoveTest, CastlingTwiceFail) {
+    char boardData[34] = { 0 };
+    boardData[32] = (1 << 4) - 1; // both castling rights available
+    utility::writeData(boardData, Coord2D('f', 1), ChessPiece::NONE);
+    utility::writeData(boardData, Coord2D('g', 1), ChessPiece::NONE);
+    utility::writeData(boardData, Coord2D('e', 1), ChessPiece::WHITE_KING);
+    utility::writeData(boardData, Coord2D('h', 1), ChessPiece::WHITE_ROOK);
+    utility::writeData(boardData, Coord2D('a', 1), ChessPiece::WHITE_ROOK);
+    utility::writeData(boardData, Coord2D('e', 8), ChessPiece::BLACK_KING);
+    ChessBoard custom(boardData);
+    Castling m1(Color::WHITE, false);
+    auto result1 = m1(custom);
+    ASSERT_TRUE(result1.has_value());
+    Castling m2(Color::WHITE, true);
+    auto result2 = m2(result1.value());
+    EXPECT_FALSE(result2.has_value());
+}
+
 TEST_F(MoveTest, EnPassantWhite) {
     // White pawn moves two squares, black pawn captures en passant
     char boardData[34] = { 0 };
