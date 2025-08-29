@@ -5,6 +5,8 @@
 #include <vector>
 #include <memory>
 
+namespace internal {
+
 /**
  * @brief This function retrieves all possible moves for the current player given the current state of the chess board.
  * 
@@ -18,3 +20,5 @@ std::vector<std::shared_ptr<ChessMove>> getAllMoves(
     Color turn, 
     bool checkForCheck = true 
 );
+
+}

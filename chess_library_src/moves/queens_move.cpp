@@ -3,6 +3,8 @@
 
 #include <stdexcept>
 
+namespace internal {
+
 /**
  * Constructor for the Queen's move. 
  * 
@@ -186,4 +188,6 @@ std::optional<ChessBoard> QueensMove::operator()(const ChessBoard& state) const 
     internal::utility::writeData(boardData, dest, promote);
 
     return ChessBoard(boardData); 
+}
+
 }

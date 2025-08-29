@@ -13,13 +13,15 @@
 static void insertAllPossibleMoves(
     const ChessBoard& board, 
     Coord2D pieceCoord, 
-    std::vector<std::shared_ptr<ChessMove>>& moves);
+    std::vector<std::shared_ptr<internal::ChessMove>>& moves);
 
 static void generateMove(
     Coord2D origin, 
     Vec2D mv, 
     ChessPiece pieceAtOrigin, 
-    std::vector<std::shared_ptr<ChessMove>>& moves);
+    std::vector<std::shared_ptr<internal::ChessMove>>& moves);
+
+namespace internal {
 
 std::vector<std::shared_ptr<ChessMove>> getAllMoves(
     const ChessBoard& board,
@@ -27,7 +29,7 @@ std::vector<std::shared_ptr<ChessMove>> getAllMoves(
     bool checkForCheck
 ) {
     
-    using namespace CheckTerminal;
+    using namespace internal::CheckTerminal;
 
     std::vector<std::shared_ptr<ChessMove>> moves;
 
@@ -114,7 +116,9 @@ std::vector<std::shared_ptr<ChessMove>> getAllMoves(
     return moves;
 }
 
-static void insertAllPossibleMoves(const ChessBoard& board, Coord2D pieceCoord, std::vector<std::shared_ptr<ChessMove>>& moves) {
+}
+ 
+static void insertAllPossibleMoves(const ChessBoard& board, Coord2D pieceCoord, std::vector<std::shared_ptr<internal::ChessMove>>& moves) {
     
     ChessPiece pieceAtCoord = board.getPiece(pieceCoord);
 
@@ -132,13 +136,13 @@ static void insertAllPossibleMoves(const ChessBoard& board, Coord2D pieceCoord, 
     }
 }
 
-static void generateMove(Coord2D origin, Vec2D mv, ChessPiece pieceAtOrigin, std::vector<std::shared_ptr<ChessMove>>& moves) {
+static void generateMove(Coord2D origin, Vec2D mv, ChessPiece pieceAtOrigin, std::vector<std::shared_ptr<internal::ChessMove>>& moves) {
     
     bool isWhiteTurn = pieceAtOrigin.isWhite();
     
     bool isKnight = pieceAtOrigin.isKnight();
     if (isKnight) {
-        moves.push_back(std::make_shared<KnightsMove>(pieceAtOrigin.color(), mv, origin));
+        moves.push_back(std::make_shared<internal::KnightsMove>(pieceAtOrigin.color(), mv, origin));
         return;
     }
 
@@ -146,7 +150,7 @@ static void generateMove(Coord2D origin, Vec2D mv, ChessPiece pieceAtOrigin, std
     Vec2D dirVec(mv.mvCol() / magnitude, mv.mvRow() / magnitude);
     
     auto dir = static_cast<Direction>(std::find(vecMap, vecMap + 8, dirVec) - vecMap);
-    moves.push_back(std::make_shared<QueensMove>(pieceAtOrigin.color(), dir, magnitude, origin));
+    moves.push_back(std::make_shared<internal::QueensMove>(pieceAtOrigin.color(), dir, magnitude, origin));
 
 
     // if it's a pawn moving to the last rank, cover the cases of underpromotion
@@ -158,8 +162,8 @@ static void generateMove(Coord2D origin, Vec2D mv, ChessPiece pieceAtOrigin, std
         ChessPiece  p1 = (isWhiteTurn) ? ChessPiece::WHITE_ROOK : ChessPiece::BLACK_ROOK, 
                     p2 = (isWhiteTurn) ? ChessPiece::WHITE_BISHOP : ChessPiece::BLACK_BISHOP, 
                     p3 = (isWhiteTurn) ? ChessPiece::WHITE_KNIGHT : ChessPiece::BLACK_KNIGHT;
-        moves.push_back(std::make_shared<Underpromotion>(pieceAtOrigin.color(), dir, origin, p1));
-        moves.push_back(std::make_shared<Underpromotion>(pieceAtOrigin.color(), dir, origin, p2));
-        moves.push_back(std::make_shared<Underpromotion>(pieceAtOrigin.color(), dir, origin, p3));
+        moves.push_back(std::make_shared<internal::Underpromotion>(pieceAtOrigin.color(), dir, origin, p1));
+        moves.push_back(std::make_shared<internal::Underpromotion>(pieceAtOrigin.color(), dir, origin, p2));
+        moves.push_back(std::make_shared<internal::Underpromotion>(pieceAtOrigin.color(), dir, origin, p3));
     }
 }

@@ -3,6 +3,8 @@
 #include "algebraic_notation.h"
 #include "castling.h"
 
+namespace internal {
+
 class CastlingAlgebraic final : public AlgebraicNotation {
 public:
     
@@ -13,3 +15,5 @@ public:
 private:
     Castling _mv;
 };
+
+}

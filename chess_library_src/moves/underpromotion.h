@@ -2,6 +2,8 @@
 
 #include "chess_move.h"
 
+namespace internal {
+
 /**
  * @brief A class representing an underpromotion move in chess.
  * An underpromotion allows a pawn to be promoted to a piece other than a queen (i.e., rook, bishop, knight) when it reaches the last row.
@@ -33,3 +35,5 @@ private:
     Coord2D _origin;
     ChessPiece _promotePiece;
 };
+
+}

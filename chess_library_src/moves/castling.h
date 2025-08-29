@@ -2,6 +2,9 @@
 
 #include "chess_move.h"
 
+namespace internal
+{
+
 /**
  * @brief A class representing a castling move in chess.
  * Castling is a special move that allows the king and a rook to move simultaneously if the king is not in check, 
@@ -24,4 +27,7 @@ public:
 private:
     bool _isLeft;
 };
+
+} // namespace internal    
+
 

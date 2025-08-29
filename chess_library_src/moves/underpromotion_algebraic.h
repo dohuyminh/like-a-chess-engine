@@ -3,6 +3,8 @@
 #include "algebraic_notation.h"
 #include "underpromotion.h"
 
+namespace internal {
+
 class UnderpromotionAlgebraic final : AlgebraicNotation {
 public:
     
@@ -14,3 +16,6 @@ private:
     Underpromotion _mv;
     std::string _resolveAmbiguity;
 };
+
+
+}

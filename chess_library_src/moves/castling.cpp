@@ -5,6 +5,9 @@
 #include <cstring>
 #include <optional>
 
+namespace internal
+{
+    
 /**
  * @brief Construct for the Castling's move
  * 
@@ -22,6 +25,7 @@ Castling::Castling(Color color, bool isLeft) noexcept :
  * @return A new state if the transition is valid, or std::nullopt otherwise
  */
 std::optional<ChessBoard> Castling::operator()(const ChessBoard& state) const {
+    
     // check if castling is allowed in the first place 
     if (!state.castling(_color, _isLeft)) {
         return std::nullopt;
@@ -74,3 +78,6 @@ std::optional<ChessBoard> Castling::operator()(const ChessBoard& state) const {
 
     return ChessBoard(boardData);
 }
+
+} // namespace internal
+

@@ -2,6 +2,7 @@
 
 #include "chess_move.h"
 
+namespace internal {
 
 /**
  * @brief A class representing a Queen's move in chess.
@@ -36,3 +37,5 @@ private:
     uint8_t _numSteps;
     Coord2D _origin; 
 };
+
+}

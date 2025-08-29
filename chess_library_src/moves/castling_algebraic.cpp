@@ -3,6 +3,8 @@
 
 #include <stdexcept>
 
+namespace internal {
+
 CastlingAlgebraic::CastlingAlgebraic(Castling mv) noexcept : _mv(mv) {}
 
 MoveResult CastlingAlgebraic::performMove(const ChessBoard& state) {
@@ -33,3 +35,4 @@ MoveResult CastlingAlgebraic::performMove(const ChessBoard& state) {
     return { an, nextState.value() };
 }
 
+}

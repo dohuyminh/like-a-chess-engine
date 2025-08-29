@@ -2,6 +2,9 @@
 
 #include "../chess_board.h"
 
+namespace internal
+{
+    
 /**
  * @brief Base class for all chess moves.
  * This class defines the interface for a chess move, which can be applied to a ChessBoard state.
@@ -33,3 +36,5 @@ public:
     virtual std::optional<ChessBoard> operator()(const ChessBoard& state) const = 0;
     virtual ~ChessMove() = default;
 };
+    
+} // namespace internal

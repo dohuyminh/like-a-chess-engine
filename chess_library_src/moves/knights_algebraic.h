@@ -3,6 +3,8 @@
 #include "algebraic_notation.h"
 #include "knights_move.h"
 
+namespace internal {
+
 class KnightsAlgebraic final : public AlgebraicNotation {
 public:
     
@@ -14,3 +16,5 @@ private:
     KnightsMove _mv;
     std::string _resolveAmbiguity;
 };
+
+}

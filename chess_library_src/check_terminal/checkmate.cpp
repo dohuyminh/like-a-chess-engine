@@ -7,6 +7,8 @@
 
 #include <stdexcept>
 
+namespace internal {
+    
 namespace CheckTerminal {
     MateStatus isCheckmate(const ChessBoard& board, Color kingsColor) {
         // if the king is not checked, it cannot be checkmate
@@ -21,4 +23,6 @@ namespace CheckTerminal {
         }
         return MateStatus::CHECKMATE;
     }
+}
+
 }

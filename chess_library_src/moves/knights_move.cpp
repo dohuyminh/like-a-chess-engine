@@ -3,6 +3,8 @@
 
 #include <stdexcept>
 
+namespace internal {
+
 /**
  * @brief Constructor for the Knight's move.
  * 
@@ -83,4 +85,6 @@ std::optional<ChessBoard> KnightsMove::operator()(const ChessBoard& state) const
 
     // return final state 
     return ChessBoard(boardData); 
+}
+
 }

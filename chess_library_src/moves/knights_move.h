@@ -2,6 +2,8 @@
 
 #include "chess_move.h"
 
+namespace internal {
+
 /**
  * @brief A class representing a Knight's move in chess.
  * A Knight's move allows a piece to move in an "L" shape: two squares in one direction and then one square perpendicular, or vice versa.
@@ -28,3 +30,5 @@ private:
     Vec2D _direction;
     Coord2D _origin;
 };
+
+}

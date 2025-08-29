@@ -4,7 +4,12 @@
 
 #include <unordered_set>
 
+namespace internal {
+    
 namespace CheckTerminal
 {
     std::unordered_set<Coord2D> kingIsChecked(const ChessBoard& board, Color kingsColor);
 } // namespace CheckTerminal
+
+}
+

@@ -1,6 +1,9 @@
 #include "chess_move.h"
 #include "../utility.h"
 
+namespace internal
+{
+
 /**
  * This method is used to update the turn's castling rights, given some move might capture a rook in its initial position.
  *
@@ -35,3 +38,5 @@ void ChessMove::updateCastling(
         }
     }
 }
+    
+} // namespace internal

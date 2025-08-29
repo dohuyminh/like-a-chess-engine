@@ -4,6 +4,8 @@
 #include <stdexcept>
 #include <cstring>
 
+namespace internal {
+
 /**
  * @brief Construct for the Underpromotion's move 
  * 
@@ -113,4 +115,6 @@ std::optional<ChessBoard> Underpromotion::operator()(const ChessBoard& state) co
     internal::utility::writeData(boardData, dest, _promotePiece);
 
     return ChessBoard(boardData);
+}
+
 }

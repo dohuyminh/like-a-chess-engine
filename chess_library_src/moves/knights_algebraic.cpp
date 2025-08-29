@@ -3,6 +3,8 @@
 
 #include <stdexcept>
 
+namespace internal {
+
 KnightsAlgebraic::KnightsAlgebraic(KnightsMove mv, std::string resolveAmbiguity) noexcept :
     _mv(mv), _resolveAmbiguity(resolveAmbiguity) {}
 
@@ -23,7 +25,7 @@ MoveResult KnightsAlgebraic::performMove(const ChessBoard& state) {
 
     // determine whether the knight captures something
     Coord2D dest = _mv.origin() + _mv.moveVec();
-    if (state.getPiece(dest) != static_cast<Piece_t>(ChessPiece::NONE)) {
+    if (!state.getPiece(dest).isNone()) {
         an.push_back('x');
     }
 
@@ -41,4 +43,6 @@ MoveResult KnightsAlgebraic::performMove(const ChessBoard& state) {
     }
 
     return { an, nextState.value() };
+}
+
 }

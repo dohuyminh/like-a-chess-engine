@@ -3,6 +3,8 @@
 #include "algebraic_notation.h"
 #include "queens_move.h"
 
+namespace internal {
+
 class QueensAlgebraic final : public AlgebraicNotation {
 public:
 
@@ -14,3 +16,5 @@ private:
     QueensMove _mv;
     std::string _resolveAmbiguity;
 };
+
+}

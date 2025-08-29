@@ -3,6 +3,8 @@
 
 #include <stdexcept>
 
+namespace internal {
+
 UnderpromotionAlgebraic::UnderpromotionAlgebraic(Underpromotion mv, std::string resolveAmbiguity) noexcept :
     _mv(mv), _resolveAmbiguity(resolveAmbiguity) {}
 
@@ -23,7 +25,7 @@ MoveResult UnderpromotionAlgebraic::performMove(const ChessBoard& state) {
 
     // confirm if the piece captures something
     Coord2D dest = _mv.origin() + _mv.moveVec();
-    if (state.getPiece(dest) != static_cast<Piece_t>(ChessPiece::NONE)) {
+    if (!state.getPiece(dest).isNone()) {
         an.push_back('x');
     }
 
@@ -59,4 +61,6 @@ MoveResult UnderpromotionAlgebraic::performMove(const ChessBoard& state) {
     }
 
     return { an, nextState.value() };
+}
+
 }
