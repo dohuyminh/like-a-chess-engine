@@ -8,14 +8,14 @@ namespace internal {
 KnightsAlgebraic::KnightsAlgebraic(KnightsMove mv, std::string resolveAmbiguity) noexcept :
     _mv(mv), _resolveAmbiguity(resolveAmbiguity) {}
 
-MoveResult KnightsAlgebraic::performMove(const ChessBoard& state) {
+MoveResult KnightsAlgebraic::performMove(const ChessBoard& board) {
 
     using namespace CheckTerminal;
 
-    // ensure the move is valid given the state 
-    std::optional<ChessBoard> nextState = _mv(state);
-    if (!nextState.has_value()) {
-        throw std::invalid_argument("The knight's move is not valid for the given state");
+    // ensure the move is valid given the board 
+    std::optional<ChessBoard> nextboard = _mv(board);
+    if (!nextboard.has_value()) {
+        throw std::invalid_argument("The knight's move is not valid for the given board");
     }
 
     std::string an = "N";
@@ -25,7 +25,7 @@ MoveResult KnightsAlgebraic::performMove(const ChessBoard& state) {
 
     // determine whether the knight captures something
     Coord2D dest = _mv.origin() + _mv.moveVec();
-    if (!state.getPiece(dest).isNone()) {
+    if (!board.getPiece(dest).isNone()) {
         an.push_back('x');
     }
 
@@ -34,7 +34,7 @@ MoveResult KnightsAlgebraic::performMove(const ChessBoard& state) {
     an.push_back(dest.row() + '0');
 
     // if the move results in checking the opponent's king, note that
-    MateStatus ms = isCheckmate(nextState.value(), ~_mv.colorOfAppliedPiece());
+    MateStatus ms = isCheckmate(nextboard.value(), ~_mv.colorOfAppliedPiece());
     if (ms == MateStatus::CHECK) {
         an.push_back('x');
     } else if (ms == MateStatus::CHECKMATE) {
@@ -42,7 +42,7 @@ MoveResult KnightsAlgebraic::performMove(const ChessBoard& state) {
         an.push_back('x');
     }
 
-    return { an, nextState.value() };
+    return { an, nextboard.value() };
 }
 
 }

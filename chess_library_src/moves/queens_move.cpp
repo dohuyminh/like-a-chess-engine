@@ -31,16 +31,16 @@ QueensMove::QueensMove(Color color, Direction direction, uint8_t numSteps, Coord
 }
 
 /**
- * This function applies the Queen's move to the given chess board state.
- * It checks if the move is valid (i.e. the transformation is done to the correct piece), updates the board accordingly, and returns a new state.
+ * This function applies the Queen's move to the given chess board board.
+ * It checks if the move is valid (i.e. the transformation is done to the correct piece), updates the board accordingly, and returns a new board.
  * If the move is invalid, it returns std::nullopt.
  * 
- * @param state The current state to be transitioned
- * @return A new state if the transition is valid, or std::nullopt otherwise
+ * @param board The current board to be transitioned
+ * @return A new board if the transition is valid, or std::nullopt otherwise
  */
-std::optional<ChessBoard> QueensMove::operator()(const ChessBoard& state) const {
+std::optional<ChessBoard> QueensMove::operator()(const ChessBoard& board) const {
     // locate the position of piece on board 
-    ChessPiece piece = state.getPiece(_origin);
+    ChessPiece piece = board.getPiece(_origin);
 
     // if there is no piece at the square, simply return invalid
     if (piece.isNone()) {
@@ -59,27 +59,27 @@ std::optional<ChessBoard> QueensMove::operator()(const ChessBoard& state) const 
 
     // get raw board 
     char boardData[34] = { 0 };
-    std::copy(state.boardData(), state.boardData() + 34, boardData);
+    std::copy(board.boardData(), board.boardData() + 34, boardData);
 
     // get the move transformation and the destination square
     Vec2D singleMv = vecMap[_direction] * (_color == Color::WHITE ? 1 : -1), mv = singleMv * _numSteps;
     Coord2D dest = _origin + mv;
     
     // piece cannot capture pieces of the same color
-    ChessPiece pieceCheck = state.getPiece(dest);
+    ChessPiece pieceCheck = board.getPiece(dest);
     if (_color == pieceCheck.color()) {
         return std::nullopt;
     }
     
     // if there is a piece between origin and destination, cannot move 
     for (Coord2D iter = _origin + singleMv; iter != dest; iter = iter + singleMv) {
-        if (!state.getPiece(iter).isNone()) {
+        if (!board.getPiece(iter).isNone()) {
             return std::nullopt;
         }
     }
     
     // only applies to pawn; end of row arrival -> queen promotion
-    ChessPiece promote = state.getPiece(_origin);
+    ChessPiece promote = board.getPiece(_origin);
     
     // pawn move 
     if (piece.isPawn()) {
@@ -92,11 +92,11 @@ std::optional<ChessBoard> QueensMove::operator()(const ChessBoard& state) const 
         if (_direction == Direction::UP_LEFT || _direction == Direction::UP_RIGHT) {
             if (_numSteps != 1) return std::nullopt;
             
-            std::optional<Coord2D> enPassant = state.enpassant(_color);
+            std::optional<Coord2D> enPassant = board.enpassant(_color);
             bool isEnpassant = enPassant == dest;
 
             // diagonal move may only be performed to capture pieces/enpassant
-            if (state.getPiece(dest).isNone() && !isEnpassant) return std::nullopt;
+            if (board.getPiece(dest).isNone() && !isEnpassant) return std::nullopt;
             
             // enpassant requires the capture of the pawn in the corresponding square 
             if (isEnpassant) {
@@ -125,7 +125,7 @@ std::optional<ChessBoard> QueensMove::operator()(const ChessBoard& state) const 
             }
             
             // pawn moving forward may not be possible if another piece is in front of it 
-            else if (_numSteps == 1 && state.getPiece(occupiedCheck) != ChessPiece::NONE) return std::nullopt;
+            else if (_numSteps == 1 && board.getPiece(occupiedCheck) != ChessPiece::NONE) return std::nullopt;
         }
         
         // if the pawn is in its last row -> promote to queen                                 
@@ -145,15 +145,15 @@ std::optional<ChessBoard> QueensMove::operator()(const ChessBoard& state) const 
         
         // rook's move may forfeit castling rights 
         if (_color == Color::WHITE) {
-            if (state.castling(_color, true) && _origin == Coord2D('a', 1)) 
+            if (board.castling(_color, true) && _origin == Coord2D('a', 1)) 
                 internal::utility::turnOffCastling(boardData, _color, true);
-            else if (state.castling(_color, false) &&  _origin == Coord2D('h', 1)) 
+            else if (board.castling(_color, false) &&  _origin == Coord2D('h', 1)) 
                 internal::utility::turnOffCastling(boardData, _color, false);;
         }
         else {
-            if (state.castling(_color, true) && _origin == Coord2D('h', 8)) 
+            if (board.castling(_color, true) && _origin == Coord2D('h', 8)) 
                 internal::utility::turnOffCastling(boardData, _color, true);
-            else if (state.castling(_color, false) && _origin == Coord2D('a', 8)) 
+            else if (board.castling(_color, false) && _origin == Coord2D('a', 8)) 
                 internal::utility::turnOffCastling(boardData, _color, false);
         }
     }
@@ -181,7 +181,7 @@ std::optional<ChessBoard> QueensMove::operator()(const ChessBoard& state) const 
     // queen's move is by default
 
     // update castling rights of opponent
-    updateCastling(state, _color, dest, boardData);
+    updateCastling(board, _color, dest, boardData);
 
     // perform transformation 
     internal::utility::writeData(boardData, _origin, ChessPiece::NONE);

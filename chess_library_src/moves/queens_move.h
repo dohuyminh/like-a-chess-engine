@@ -20,7 +20,7 @@ class QueensMove final : public ChessMove {
 public:
     QueensMove(Color color, Direction direction, uint8_t numSteps, Coord2D origin); 
     
-    std::optional<ChessBoard> operator()(const ChessBoard& state) const override;
+    std::optional<ChessBoard> operator()(const ChessBoard& board) const override;
 
     [[nodiscard]] inline Coord2D origin() const {
         return _origin;

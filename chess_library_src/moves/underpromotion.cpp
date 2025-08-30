@@ -60,14 +60,14 @@ Underpromotion::Underpromotion(Color color, Direction direction, Coord2D origin,
 }
 
 /**
- * @brief This function applies the Underpromotion's move to the given chess board state.
+ * @brief This function applies the Underpromotion's move to the given chess board board.
  * 
- * @param state The current state to be transitioned
- * @return A new state if the transition is valid, or std::nullopt otherwise
+ * @param board The current board to be transitioned
+ * @return A new board if the transition is valid, or std::nullopt otherwise
  */
-std::optional<ChessBoard> Underpromotion::operator()(const ChessBoard& state) const {
+std::optional<ChessBoard> Underpromotion::operator()(const ChessBoard& board) const {
     // get the piece at origin 
-    ChessPiece piece = state.getPiece(_origin);
+    ChessPiece piece = board.getPiece(_origin);
     if (!piece.isPawn()) {
         return std::nullopt;
     }
@@ -79,7 +79,7 @@ std::optional<ChessBoard> Underpromotion::operator()(const ChessBoard& state) co
 
     // get raw board 
     char boardData[34] = { 0 };
-    std::copy(state.boardData(), state.boardData() + 34, boardData);
+    std::copy(board.boardData(), board.boardData() + 34, boardData);
 
     // get direction and new piece position after transformation
     Vec2D dir = vecMap[_direction];
@@ -87,7 +87,7 @@ std::optional<ChessBoard> Underpromotion::operator()(const ChessBoard& state) co
 
     Coord2D dest = _origin + dir;
 
-    ChessPiece pieceAtDest = state.getPiece(dest);
+    ChessPiece pieceAtDest = board.getPiece(dest);
 
     // check if the destination is valid (i.e. pawn cannot capture piece of the same color)
     if (pieceAtDest.color() == _color) {
@@ -106,7 +106,7 @@ std::optional<ChessBoard> Underpromotion::operator()(const ChessBoard& state) co
     }
 
     // update castling + en passant 
-    updateCastling(state, _color, dest, boardData);
+    updateCastling(board, _color, dest, boardData);
     internal::utility::turnOffEnpassant(boardData);
 
     uint8_t originIdx = _origin.toFlatIdx(), destIdx = dest.toFlatIdx();

@@ -38,14 +38,14 @@ KnightsMove::KnightsMove(Color color, Vec2D direction, Coord2D origin) :
 }
 
 /**
- * @brief This function applies the Knight's move to the given chess board state.
+ * @brief This function applies the Knight's move to the given chess board board.
  * 
- * @param state The current state to be transitioned 
- * @return A new state if the transition is valid, or std::nullopt otherwise
+ * @param board The current board to be transitioned 
+ * @return A new board if the transition is valid, or std::nullopt otherwise
  */
-std::optional<ChessBoard> KnightsMove::operator()(const ChessBoard& state) const {
+std::optional<ChessBoard> KnightsMove::operator()(const ChessBoard& board) const {
     // locate the position of piece on board 
-    ChessPiece piece = state.getPiece(_origin);
+    ChessPiece piece = board.getPiece(_origin);
 
     // if there is no piece at the square, simply return invalid
     if (piece.isNone()) {
@@ -66,24 +66,24 @@ std::optional<ChessBoard> KnightsMove::operator()(const ChessBoard& state) const
     Coord2D dest = _origin + _direction;
 
     // check if the position is valid (i.e. knights cannot capture pieces of the same color)
-    if (piece.color() == state.getPiece(dest).color()) {
+    if (piece.color() == board.getPiece(dest).color()) {
 
         return std::nullopt;
     }
 
     // get the raw board
     char boardData[34] = { 0 };
-    std::copy(state.boardData(), state.boardData() + 34, boardData);
+    std::copy(board.boardData(), board.boardData() + 34, boardData);
 
     // transform the raw board 
     internal::utility::writeData(boardData, _origin, ChessPiece::NONE);
     internal::utility::writeData(boardData, dest, piece);
     
     // update castling + en passant
-    updateCastling(state, _color, dest, boardData);
+    updateCastling(board, _color, dest, boardData);
     internal::utility::turnOffEnpassant(boardData);
 
-    // return final state 
+    // return final board 
     return ChessBoard(boardData); 
 }
 

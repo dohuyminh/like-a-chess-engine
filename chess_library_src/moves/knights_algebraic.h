@@ -10,7 +10,7 @@ public:
     
     KnightsAlgebraic(KnightsMove mv, std::string resolveAmbiguity) noexcept;
 
-    MoveResult performMove(const ChessBoard& state) override;
+    MoveResult performMove(const ChessBoard& board) override;
 
 private:
     KnightsMove _mv;

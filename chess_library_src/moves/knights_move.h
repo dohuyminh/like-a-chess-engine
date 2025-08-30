@@ -14,7 +14,7 @@ class KnightsMove final : public ChessMove {
 public:
     KnightsMove(Color color, Vec2D direction, Coord2D origin);
 
-    std::optional<ChessBoard> operator()(const ChessBoard& state) const override;
+    std::optional<ChessBoard> operator()(const ChessBoard& board) const override;
 
     [[nodiscard]] inline Coord2D origin() const {
         return _origin;

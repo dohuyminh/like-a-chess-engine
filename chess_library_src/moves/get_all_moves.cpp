@@ -105,8 +105,8 @@ std::vector<std::shared_ptr<ChessMove>> getAllMoves(
         
         moves.erase(std::remove_if(moves.begin(), moves.end(), [&board, turn](const std::shared_ptr<ChessMove>& move) {
             // apply the move to the board
-            std::optional<ChessBoard> newState = (*move)(board);
-            auto check = kingIsChecked(newState.value(), turn);
+            std::optional<ChessBoard> newboard = (*move)(board);
+            auto check = kingIsChecked(newboard.value(), turn);
             // check if the king is checked after the move
             return !check.empty();
         }), moves.end());

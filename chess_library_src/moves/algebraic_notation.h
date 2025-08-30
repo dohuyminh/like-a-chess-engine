@@ -14,7 +14,7 @@ public:
     virtual ~AlgebraicNotation() = default;
 
 protected:
-    virtual MoveResult performMove(const ChessBoard& state);         
+    virtual MoveResult performMove(const ChessBoard& board);         
 };
 
 }

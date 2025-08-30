@@ -14,7 +14,7 @@ class Underpromotion final : public ChessMove {
 public:
     Underpromotion(Color color, Direction direction, Coord2D origin, ChessPiece promotePiece);
 
-    std::optional<ChessBoard> operator()(const ChessBoard& state) const override;
+    std::optional<ChessBoard> operator()(const ChessBoard& board) const override;
 
     [[nodiscard]] inline Coord2D origin() const {
         return _origin;

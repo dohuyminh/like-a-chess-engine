@@ -8,14 +8,14 @@ namespace internal {
 UnderpromotionAlgebraic::UnderpromotionAlgebraic(Underpromotion mv, std::string resolveAmbiguity) noexcept :
     _mv(mv), _resolveAmbiguity(resolveAmbiguity) {}
 
-MoveResult UnderpromotionAlgebraic::performMove(const ChessBoard& state) {
+MoveResult UnderpromotionAlgebraic::performMove(const ChessBoard& board) {
 
     using namespace CheckTerminal;
 
-    // verify whether the move is valid for the given state
-    std::optional<ChessBoard> nextState = _mv(state);
-    if (!nextState.has_value()) {
-        throw std::invalid_argument("The underpromotion move is not valid for the given state");
+    // verify whether the move is valid for the given board
+    std::optional<ChessBoard> nextboard = _mv(board);
+    if (!nextboard.has_value()) {
+        throw std::invalid_argument("The underpromotion move is not valid for the given board");
     }
     
     std::string an;
@@ -25,7 +25,7 @@ MoveResult UnderpromotionAlgebraic::performMove(const ChessBoard& state) {
 
     // confirm if the piece captures something
     Coord2D dest = _mv.origin() + _mv.moveVec();
-    if (!state.getPiece(dest).isNone()) {
+    if (!board.getPiece(dest).isNone()) {
         an.push_back('x');
     }
 
@@ -51,8 +51,8 @@ MoveResult UnderpromotionAlgebraic::performMove(const ChessBoard& state) {
             break;
     }
 
-    // if the resulting state checks the opponent's king, note that
-    MateStatus ms = isCheckmate(nextState.value(), ~_mv.colorOfAppliedPiece());
+    // if the resulting board checks the opponent's king, note that
+    MateStatus ms = isCheckmate(nextboard.value(), ~_mv.colorOfAppliedPiece());
     if (ms == MateStatus::CHECK) {
         an.push_back('x');
     } else if (ms == MateStatus::CHECKMATE) {
@@ -60,7 +60,7 @@ MoveResult UnderpromotionAlgebraic::performMove(const ChessBoard& state) {
         an.push_back('x');
     }
 
-    return { an, nextState.value() };
+    return { an, nextboard.value() };
 }
 
 }

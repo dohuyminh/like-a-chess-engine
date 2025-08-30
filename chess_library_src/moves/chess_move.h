@@ -7,15 +7,15 @@ namespace internal
     
 /**
  * @brief Base class for all chess moves.
- * This class defines the interface for a chess move, which can be applied to a ChessBoard state.
- * For a specific chess move object, one can call the operator() to apply the move to a given ChessBoard state.
- * If the move is valid, it returns a new ChessBoard state; otherwise, it returns ```std::nullopt```.
+ * This class defines the interface for a chess move, which can be applied to a ChessBoard board.
+ * For a specific chess move object, one can call the operator() to apply the move to a given ChessBoard board.
+ * If the move is valid, it returns a new ChessBoard board; otherwise, it returns ```std::nullopt```.
  */
 class ChessMove {
 protected:
 
     static void updateCastling(
-        const ChessBoard& state, 
+        const ChessBoard& board, 
         Color turn,
         Coord2D newPoint, 
         char* boardData);
@@ -33,7 +33,7 @@ public:
         return _color;
     }
 
-    virtual std::optional<ChessBoard> operator()(const ChessBoard& state) const = 0;
+    virtual std::optional<ChessBoard> operator()(const ChessBoard& board) const = 0;
     virtual ~ChessMove() = default;
 };
     

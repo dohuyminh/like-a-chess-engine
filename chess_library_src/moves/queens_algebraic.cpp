@@ -8,18 +8,18 @@ namespace internal {
 QueensAlgebraic::QueensAlgebraic(QueensMove mv, std::string resolveAmbiguity) noexcept :
     _mv(mv), _resolveAmbiguity(resolveAmbiguity) {}
 
-MoveResult QueensAlgebraic::performMove(const ChessBoard& state) {
+MoveResult QueensAlgebraic::performMove(const ChessBoard& board) {
 
     using namespace CheckTerminal;
 
     // ensure the given move is valid 
-    std::optional<ChessBoard> nextState = _mv(state);
-    if (!nextState.has_value()) {
-        throw std::invalid_argument("The queen's move is not valid for the given state");
+    std::optional<ChessBoard> nextboard = _mv(board);
+    if (!nextboard.has_value()) {
+        throw std::invalid_argument("The queen's move is not valid for the given board");
     }
     
     std::string an;
-    ChessPiece pieceAtOrigin = state.getPiece(_mv.origin());
+    ChessPiece pieceAtOrigin = board.getPiece(_mv.origin());
     // depends on which piece is being moved, note it at the beginning of the move's name
     
     if (pieceAtOrigin.isKing())        an.push_back('K');
@@ -32,7 +32,7 @@ MoveResult QueensAlgebraic::performMove(const ChessBoard& state) {
     
     // confirm if the piece captured something
     Coord2D dest = _mv.origin() + _mv.moveVec();
-    if (!state.getPiece(dest).isNone() || (pieceAtOrigin.isPawn() && state.enpassant(~pieceAtOrigin.color()) == dest)) {
+    if (!board.getPiece(dest).isNone() || (pieceAtOrigin.isPawn() && board.enpassant(~pieceAtOrigin.color()) == dest)) {
         an.push_back('x');
     }
 
@@ -46,8 +46,8 @@ MoveResult QueensAlgebraic::performMove(const ChessBoard& state) {
         an.push_back('Q');
     }
 
-    // if the next state results in opponent's king being checked, note that
-    MateStatus ms = isCheckmate(nextState.value(), ~_mv.colorOfAppliedPiece());
+    // if the next board results in opponent's king being checked, note that
+    MateStatus ms = isCheckmate(nextboard.value(), ~_mv.colorOfAppliedPiece());
     if (ms == MateStatus::CHECK) {
         an.push_back('x');
     } else if (ms == MateStatus::CHECKMATE) {
@@ -55,7 +55,7 @@ MoveResult QueensAlgebraic::performMove(const ChessBoard& state) {
         an.push_back('x');
     }
 
-    return { an, nextState.value() };
+    return { an, nextboard.value() };
 }
 
 }

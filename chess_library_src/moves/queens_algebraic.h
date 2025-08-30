@@ -10,7 +10,7 @@ public:
 
     QueensAlgebraic(QueensMove mv, std::string resolveAmbiguity) noexcept;
 
-    MoveResult performMove(const ChessBoard& state) override;
+    MoveResult performMove(const ChessBoard& board) override;
 
 private:
     QueensMove _mv;
