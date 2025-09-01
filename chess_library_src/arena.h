@@ -2,6 +2,7 @@
 
 #include "chess_board.h"
 #include "moves/chess_move.h"
+#include "moves/get_all_moves.h"
 
 class Arena {
 public:
@@ -24,12 +25,29 @@ public:
         return _movesWithoutProgress;
     }
 
-    std::string performMove(const internal::ChessMove& mv);
+    [[nodiscard]] inline const std::vector< std::string >& logs() const {
+        return _logs;
+    }
 
-        
+    [[nodiscard]] inline const ChessBoard& currentBoard() const {
+        return _currBoard;
+    }
+
+    [[nodiscard]] inline Color turn() const {
+        return _turn;
+    }
+
+    void performMove(const internal::ChessMove& mv);
+
+    inline std::vector< std::shared_ptr< internal::ChessMove > > getAllMoves() const {
+        return internal::getAllMoves(_currBoard, _turn);
+    } 
 
 private:
     
+    // for identifying Arena object
+    std::size_t _id;
+
     // board information
     ChessBoard _currBoard;
     std::size_t _movesWithoutProgress;
