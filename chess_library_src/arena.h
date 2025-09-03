@@ -7,7 +7,7 @@
 class Arena {
 public:
     
-    Arena(bool setTime = false);
+    Arena();
 
     [[nodiscard]] inline Color winner() const {
         return _winner;
@@ -44,9 +44,6 @@ public:
     } 
 
 private:
-    
-    // for identifying Arena object
-    std::size_t _id;
 
     // board information
     ChessBoard _currBoard;

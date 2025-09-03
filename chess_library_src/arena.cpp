@@ -2,10 +2,27 @@
 
 #include <stdexcept>
 
-Arena::Arena(bool setTime) : _setTime(setTime) : _id(-1) {
+Arena::Arena() :
+    _currBoard(),
+    _movesWithoutProgress(0),
+    _boardCount({ {_currBoard, 1} }),
+    _turn(Color::WHITE),
+    _winner(Color::NONE),
+    _logs()
+{
     
 }
 
 void Arena::performMove(const internal::ChessMove& mv) {
-    _currBoard = mv(_currBoard);
+    // get new board
+    _currBoard = mv(_currBoard).value();
+
+    // switch turn
+    _turn = ~_turn;
+
+    // update board occurrence
+    ++_boardCount[_currBoard];
+
+    // update moves without progress
 }
+

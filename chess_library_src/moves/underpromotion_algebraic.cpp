@@ -18,6 +18,10 @@ MoveResult UnderpromotionAlgebraic::performMove(const ChessBoard& board) {
         throw std::invalid_argument("The underpromotion move is not valid for the given board");
     }
     
+    // underpromotion always involves a pawn move
+    // so we can directly note that a pawn has moved
+    bool capture = false;
+
     std::string an;
 
     // resolve ambiguity
@@ -26,6 +30,7 @@ MoveResult UnderpromotionAlgebraic::performMove(const ChessBoard& board) {
     // confirm if the piece captures something
     Coord2D dest = _mv.origin() + _mv.moveVec();
     if (!board.getPiece(dest).isNone()) {
+        capture = true;
         an.push_back('x');
     }
 
@@ -60,7 +65,7 @@ MoveResult UnderpromotionAlgebraic::performMove(const ChessBoard& board) {
         an.push_back('x');
     }
 
-    return { an, nextboard.value() };
+    return { an, nextboard.value(), capture, true };
 }
 
 }

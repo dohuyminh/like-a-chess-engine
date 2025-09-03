@@ -31,8 +31,11 @@ MoveResult CastlingAlgebraic::performMove(const ChessBoard& board) {
         an.push_back('x');
     }
 
+    // castling automatically means no capture and no pawn move
+    // so we can directly return the result
+
     // return final result 
-    return { an, nextboard.value() };
+    return { an, nextboard.value(), false, false };
 }
 
 }

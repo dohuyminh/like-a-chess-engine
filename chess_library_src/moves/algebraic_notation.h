@@ -5,7 +5,26 @@
 #include <utility>
 #include <string>
 
-typedef std::pair<std::string, ChessBoard> MoveResult;
+using namespace internal::CheckTerminal;
+
+struct MoveResult {
+    // for logging move history
+    const std::string notation;
+
+    // for updating board state
+    const ChessBoard nextBoard;
+
+    // for updating moves without progress
+    const bool capture;
+    const bool pawnMoved;
+
+    MoveResult(std::string notation, ChessBoard nextBoard, bool capture, bool pawnMoved) :
+        notation(notation),
+        nextBoard(nextBoard),
+        capture(capture),
+        pawnMoved(pawnMoved)
+    {}
+};
 
 namespace internal {
 

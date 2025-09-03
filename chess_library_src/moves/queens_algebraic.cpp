@@ -12,6 +12,9 @@ MoveResult QueensAlgebraic::performMove(const ChessBoard& board) {
 
     using namespace CheckTerminal;
 
+    bool capture = false;
+    bool pawnMoved = false;
+
     // ensure the given move is valid 
     std::optional<ChessBoard> nextboard = _mv(board);
     if (!nextboard.has_value()) {
@@ -26,13 +29,15 @@ MoveResult QueensAlgebraic::performMove(const ChessBoard& board) {
     else if (pieceAtOrigin.isQueen())  an.push_back('Q');
     else if (pieceAtOrigin.isRook())   an.push_back('R');
     else if (pieceAtOrigin.isBishop()) an.push_back('B');
-    
+    else                               pawnMoved = true; // if it's a pawn, we don't note anything but we do note that a pawn has moved
+
     // resolve any ambiguity
     an += _resolveAmbiguity;
     
     // confirm if the piece captured something
     Coord2D dest = _mv.origin() + _mv.moveVec();
     if (!board.getPiece(dest).isNone() || (pieceAtOrigin.isPawn() && board.enpassant(~pieceAtOrigin.color()) == dest)) {
+        capture = true;
         an.push_back('x');
     }
 
@@ -55,7 +60,7 @@ MoveResult QueensAlgebraic::performMove(const ChessBoard& board) {
         an.push_back('x');
     }
 
-    return { an, nextboard.value() };
+    return { an, nextboard.value(), capture, pawnMoved };
 }
 
 }

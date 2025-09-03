@@ -12,6 +12,9 @@ MoveResult KnightsAlgebraic::performMove(const ChessBoard& board) {
 
     using namespace CheckTerminal;
 
+    // whether knight captured a piece or not
+    bool capture = false;
+
     // ensure the move is valid given the board 
     std::optional<ChessBoard> nextboard = _mv(board);
     if (!nextboard.has_value()) {
@@ -26,6 +29,7 @@ MoveResult KnightsAlgebraic::performMove(const ChessBoard& board) {
     // determine whether the knight captures something
     Coord2D dest = _mv.origin() + _mv.moveVec();
     if (!board.getPiece(dest).isNone()) {
+        capture = true;
         an.push_back('x');
     }
 
@@ -42,7 +46,7 @@ MoveResult KnightsAlgebraic::performMove(const ChessBoard& board) {
         an.push_back('x');
     }
 
-    return { an, nextboard.value() };
+    return { an, nextboard.value(), capture, false };
 }
 
 }
