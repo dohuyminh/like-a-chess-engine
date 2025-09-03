@@ -60,10 +60,9 @@ MoveResult UnderpromotionAlgebraic::performMove(const ChessBoard& board) {
     // if the resulting board checks the opponent's king, note that
     MateStatus ms = isCheckmate(nextboard.value(), ~_mv.colorOfAppliedPiece());
     if (ms == MateStatus::CHECK) {
-        an.push_back('x');
+        an.push_back('+');
     } else if (ms == MateStatus::CHECKMATE) {
-        an.push_back('x');
-        an.push_back('x');
+        an.push_back('#');
     }
 
     return { an, nextboard.value(), capture, true };
