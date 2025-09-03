@@ -8,13 +8,12 @@ namespace internal {
 class QueensAlgebraic final : public AlgebraicNotation {
 public:
 
-    QueensAlgebraic(QueensMove mv, std::string resolveAmbiguity) noexcept;
+    QueensAlgebraic(QueensMove mv) noexcept;
 
     MoveResult performMove(const ChessBoard& board) override;
 
 private:
     QueensMove _mv;
-    std::string _resolveAmbiguity;
 };
 
 }

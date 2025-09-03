@@ -5,8 +5,9 @@
 
 namespace internal {
 
-UnderpromotionAlgebraic::UnderpromotionAlgebraic(Underpromotion mv, std::string resolveAmbiguity) noexcept :
-    _mv(mv), _resolveAmbiguity(resolveAmbiguity) {}
+UnderpromotionAlgebraic::UnderpromotionAlgebraic(Underpromotion mv) noexcept :
+    _mv(mv)
+{}
 
 MoveResult UnderpromotionAlgebraic::performMove(const ChessBoard& board) {
 
@@ -25,7 +26,7 @@ MoveResult UnderpromotionAlgebraic::performMove(const ChessBoard& board) {
     std::string an;
 
     // resolve ambiguity
-    an += _resolveAmbiguity;
+    an += _mv.origin();
 
     // confirm if the piece captures something
     Coord2D dest = _mv.origin() + _mv.moveVec();

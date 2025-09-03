@@ -5,8 +5,9 @@
 
 namespace internal {
 
-QueensAlgebraic::QueensAlgebraic(QueensMove mv, std::string resolveAmbiguity) noexcept :
-    _mv(mv), _resolveAmbiguity(resolveAmbiguity) {}
+QueensAlgebraic::QueensAlgebraic(QueensMove mv) noexcept :
+    _mv(mv)
+{}
 
 MoveResult QueensAlgebraic::performMove(const ChessBoard& board) {
 
@@ -32,7 +33,7 @@ MoveResult QueensAlgebraic::performMove(const ChessBoard& board) {
     else                               pawnMoved = true; // if it's a pawn, we don't note anything but we do note that a pawn has moved
 
     // resolve any ambiguity
-    an += _resolveAmbiguity;
+    an += _mv.origin();
     
     // confirm if the piece captured something
     Coord2D dest = _mv.origin() + _mv.moveVec();

@@ -8,13 +8,12 @@ namespace internal {
 class UnderpromotionAlgebraic final : AlgebraicNotation {
 public:
     
-    UnderpromotionAlgebraic(Underpromotion mv, std::string resolveAmbiguity) noexcept;
+    UnderpromotionAlgebraic(Underpromotion mv) noexcept;
 
     MoveResult performMove(const ChessBoard& board) override;
 
 private:
     Underpromotion _mv;
-    std::string _resolveAmbiguity;
 };
 
 

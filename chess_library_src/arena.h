@@ -37,7 +37,7 @@ public:
         return _turn;
     }
 
-    void performMove(const internal::ChessMove& mv);
+    void performMove(const std::shared_ptr< internal::ChessMove >& mv);
 
     inline std::vector< std::shared_ptr< internal::ChessMove > > getAllMoves() const {
         return internal::getAllMoves(_currBoard, _turn);

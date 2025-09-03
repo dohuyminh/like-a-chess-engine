@@ -5,8 +5,9 @@
 
 namespace internal {
 
-KnightsAlgebraic::KnightsAlgebraic(KnightsMove mv, std::string resolveAmbiguity) noexcept :
-    _mv(mv), _resolveAmbiguity(resolveAmbiguity) {}
+KnightsAlgebraic::KnightsAlgebraic(KnightsMove mv) noexcept :
+    _mv(mv)
+{}
 
 MoveResult KnightsAlgebraic::performMove(const ChessBoard& board) {
 
@@ -24,7 +25,7 @@ MoveResult KnightsAlgebraic::performMove(const ChessBoard& board) {
     std::string an = "N";
     
     // resolve ambiguity
-    an += _resolveAmbiguity;
+    an += _mv.origin();
 
     // determine whether the knight captures something
     Coord2D dest = _mv.origin() + _mv.moveVec();

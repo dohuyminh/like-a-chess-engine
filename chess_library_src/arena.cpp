@@ -1,4 +1,5 @@
 #include "arena.h"
+#include "moves/next_state.h"
 
 #include <stdexcept>
 
@@ -13,16 +14,28 @@ Arena::Arena() :
     
 }
 
-void Arena::performMove(const internal::ChessMove& mv) {
-    // get new board
-    _currBoard = mv(_currBoard).value();
+void Arena::performMove(const std::shared_ptr< internal::ChessMove >& mv) {
+    
+    MoveResult result = internal::nextState(_currBoard, mv);
 
-    // switch turn
-    _turn = ~_turn;
+    // update board state/logs
+    _currBoard = result.nextBoard;
+    _logs.push_back(result.notation);
 
-    // update board occurrence
+    // update board count
     ++_boardCount[_currBoard];
 
     // update moves without progress
+    if (result.capture || result.pawnMoved) {
+        _movesWithoutProgress = 0;
+    } else {
+        ++_movesWithoutProgress;
+    }
+
+    // if move results in a checkmate 
+
+    // if move results in a stalemate
+
+    // otherwise, continue the game
 }
 
