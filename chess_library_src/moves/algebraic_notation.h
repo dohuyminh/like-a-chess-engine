@@ -5,8 +5,6 @@
 #include <utility>
 #include <string>
 
-using namespace internal::CheckTerminal;
-
 struct MoveResult {
     // for logging move history
     const std::string notation;

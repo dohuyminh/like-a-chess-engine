@@ -4,17 +4,36 @@
 #include "moves/chess_move.h"
 #include "moves/get_all_moves.h"
 
+#include <deque>
+
+struct State {
+    const ChessBoard board;
+    const bool isTerminal;
+    const Color turn;
+    const Color winner;
+    const std::vector< std::shared_ptr< internal::ChessMove > > possibleMoves;
+    const std::size_t movesWithoutProgress;
+
+    State(
+        const ChessBoard& board, 
+        bool isTerminal, 
+        Color turn, 
+        Color winner, 
+        std::size_t movesWithoutProgress
+    );
+};
+
 class Arena {
 public:
     
-    Arena();
+    Arena(std::size_t historySize = 1);
 
     [[nodiscard]] inline Color winner() const {
-        return _winner;
+        return _stateHistory.back().winner;
     }
 
     [[nodiscard]] inline Color turn() const {
-        return _turn;
+        return _stateHistory.back().turn;
     }
 
     [[nodiscard]] inline std::size_t occurrence(const ChessBoard& board) {
@@ -22,7 +41,7 @@ public:
     }
 
     [[nodiscard]] inline std::size_t movesWithoutProgress() const {
-        return _movesWithoutProgress;
+        return _stateHistory.back().movesWithoutProgress;
     }
 
     [[nodiscard]] inline const std::vector< std::string >& logs() const {
@@ -30,30 +49,21 @@ public:
     }
 
     [[nodiscard]] inline const ChessBoard& currentBoard() const {
-        return _currBoard;
+        return _stateHistory.back().board;
     }
 
-    [[nodiscard]] inline Color turn() const {
-        return _turn;
-    }
-
-    void performMove(const std::shared_ptr< internal::ChessMove >& mv);
-
-    inline std::vector< std::shared_ptr< internal::ChessMove > > getAllMoves() const {
-        return internal::getAllMoves(_currBoard, _turn);
-    } 
+    void performMove(const std::shared_ptr< internal::ChessMove >& mv); 
 
 private:
+    
+    std::size_t _historySize;
 
-    // board information
-    ChessBoard _currBoard;
-    std::size_t _movesWithoutProgress;
+    // board counter
     std::unordered_map< ChessBoard, std::size_t > _boardCount; 
-
-    // player's information
-    Color _turn;
-    Color _winner;
 
     // move logs
     std::vector< std::string > _logs;  
+
+    // keeps track of state
+    std::deque< State > _stateHistory;
 };

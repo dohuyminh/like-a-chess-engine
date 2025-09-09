@@ -1,4 +1,4 @@
-#include "next_state.h"
+#include "next_board.h"
 #include "queens_algebraic.h"
 #include "knights_algebraic.h"
 #include "underpromotion_algebraic.h"
@@ -6,7 +6,7 @@
 
 namespace internal {
 
-MoveResult nextState(const ChessBoard& board, const std::shared_ptr< internal::ChessMove >& mv) {
+MoveResult nextBoard(const ChessBoard& board, const std::shared_ptr< internal::ChessMove >& mv) {
     
     if (!mv) {
         throw std::invalid_argument("Move cannot be null");

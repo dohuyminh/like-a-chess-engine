@@ -2,6 +2,7 @@
 #include "chess_board.h"
 #include "check_terminal/check.h"
 #include "check_terminal/checkmate.h"
+#include "moves/get_all_moves.h"
 #include "utility.h"
 
 using namespace internal;
@@ -114,8 +115,10 @@ TEST_F(ChessBoardTest, KingIsCheckedByKing) {
 TEST_F(ChessBoardTest, IsCheckmateFalseOnInitial) {
     testing::internal::CaptureStdout();
     try {
-        EXPECT_EQ(CheckTerminal::isCheckmate(board, Color::WHITE), CheckTerminal::MateStatus::NONE);
-        EXPECT_EQ(CheckTerminal::isCheckmate(board, Color::BLACK), CheckTerminal::MateStatus::NONE);
+        auto wm = getAllMoves(board, Color::WHITE);
+        auto bm = getAllMoves(board, Color::BLACK);
+        EXPECT_EQ(CheckTerminal::isCheckmate(board, Color::WHITE, wm.size()), CheckTerminal::MateStatus::NONE);
+        EXPECT_EQ(CheckTerminal::isCheckmate(board, Color::BLACK, bm.size()), CheckTerminal::MateStatus::NONE);
     } catch (std::invalid_argument const& e) {
         std::string output = testing::internal::GetCapturedStdout();
         std::cout << "[DEBUG] Output before exception:\n" << output << std::endl;
@@ -133,7 +136,8 @@ TEST_F(ChessBoardTest, IsCheckmateTrueSimple) {
     utility::writeData(boardData, Coord2D('d', 8), ChessPiece::NONE);
     utility::writeData(boardData, Coord2D('h', 4), ChessPiece::BLACK_QUEEN);
     ChessBoard custom(boardData);
-    EXPECT_EQ(CheckTerminal::isCheckmate(custom, Color::WHITE), CheckTerminal::MateStatus::CHECKMATE) << custom.getWhitePOV();
+    auto wm = getAllMoves(custom, Color::WHITE);
+    EXPECT_EQ(CheckTerminal::isCheckmate(custom, Color::WHITE, wm.size()), CheckTerminal::MateStatus::CHECKMATE) << custom.getWhitePOV();
 }
 
 TEST_F(ChessBoardTest, IsCheckMateCustom1) {
@@ -148,7 +152,8 @@ TEST_F(ChessBoardTest, IsCheckMateCustom1) {
     utility::writeData(boardData, Coord2D('e', 8), ChessPiece::BLACK_KING);
 
     ChessBoard customBoard(boardData);
-    EXPECT_EQ(CheckTerminal::isCheckmate(customBoard, Color::WHITE), CheckTerminal::MateStatus::CHECKMATE) << customBoard.getWhitePOV();
+    auto wm = getAllMoves(customBoard, Color::WHITE);
+    EXPECT_EQ(CheckTerminal::isCheckmate(customBoard, Color::WHITE, wm.size()), CheckTerminal::MateStatus::CHECKMATE) << customBoard.getWhitePOV();
 }
 
 TEST_F(ChessBoardTest, IsCheckmateFalseIfKingCanEscape) {
@@ -158,5 +163,6 @@ TEST_F(ChessBoardTest, IsCheckmateFalseIfKingCanEscape) {
     utility::writeData(boardData, Coord2D('e', 3), ChessPiece::BLACK_ROOK);
     
     ChessBoard custom(boardData);
-    EXPECT_EQ(CheckTerminal::isCheckmate(custom, Color::WHITE), CheckTerminal::MateStatus::CHECK) << custom.getWhitePOV();
+    auto wm = getAllMoves(custom, Color::WHITE);
+    EXPECT_EQ(CheckTerminal::isCheckmate(custom, Color::WHITE, wm.size()), CheckTerminal::MateStatus::CHECK) << custom.getWhitePOV();
 }

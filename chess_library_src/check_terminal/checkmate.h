@@ -10,7 +10,7 @@ namespace CheckTerminal
         NONE, CHECK, CHECKMATE
     };
     
-    MateStatus isCheckmate(const ChessBoard& board, Color kingsColor);
+    MateStatus isCheckmate(const ChessBoard& board, Color kingsColor, std::size_t numLegalMoves);
 } // namespace CheckTerminal
     
 } // namespace internal

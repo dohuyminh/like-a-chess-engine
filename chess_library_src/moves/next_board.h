@@ -9,6 +9,6 @@
 
 namespace internal {
 
-MoveResult nextState(const ChessBoard& board, const std::shared_ptr< internal::ChessMove >& mv);
+MoveResult nextBoard(const ChessBoard& board, const std::shared_ptr< internal::ChessMove >& mv);
 
 }

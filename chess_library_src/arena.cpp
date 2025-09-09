@@ -1,41 +1,54 @@
 #include "arena.h"
-#include "moves/next_state.h"
+#include "moves/next_board.h"
+#include "check_terminal/checkmate.h"
 
 #include <stdexcept>
 
-Arena::Arena() :
-    _currBoard(),
-    _movesWithoutProgress(0),
-    _boardCount({ {_currBoard, 1} }),
-    _turn(Color::WHITE),
-    _winner(Color::NONE),
-    _logs()
+using namespace internal;
+
+Arena::Arena(std::size_t historySize) : 
+    _historySize(historySize)
 {
-    
+    if (historySize == 0) {
+        throw std::invalid_argument("History size must be at least 1");
+    }
+
+    // initialize board state
+    _stateHistory.emplace_back(
+        ChessBoard(), 
+        false, 
+        Color::WHITE, 
+        Color::NONE, 
+        0
+    );
+
+    // initialize board count
+    _boardCount[_stateHistory.back().board] = 1;
 }
 
 void Arena::performMove(const std::shared_ptr< internal::ChessMove >& mv) {
     
-    MoveResult result = internal::nextState(_currBoard, mv);
-
-    // update board state/logs
-    _currBoard = result.nextBoard;
-    _logs.push_back(result.notation);
-
-    // update board count
-    ++_boardCount[_currBoard];
-
-    // update moves without progress
-    if (result.capture || result.pawnMoved) {
-        _movesWithoutProgress = 0;
-    } else {
-        ++_movesWithoutProgress;
+    if (!mv) {
+        throw std::invalid_argument("Move cannot be null");
     }
 
-    // if move results in a checkmate 
+    // get next board
+    MoveResult result = internal::nextBoard(_stateHistory.back().board, mv);
 
-    // if move results in a stalemate
+    // update board count
+    _boardCount[result.nextBoard]++;
 
-    // otherwise, continue the game
+    // update move logs
+    _logs.push_back(result.notation);
+
+    // update state history
+    Color nextTurn = ~_stateHistory.back().turn;
+    std::size_t nextMovesWithoutProgress = result.capture || result.pawnMoved ? 0 : _stateHistory.back().movesWithoutProgress + 1;
+    std::vector< std::shared_ptr< internal::ChessMove > > nextPossibleMoves = internal::getAllMoves(result.nextBoard, nextTurn);
+
+    // check if the next state is terminal
+    CheckTerminal::MateStatus ms = CheckTerminal::isCheckmate(result.nextBoard, nextTurn, result);
+
+
 }
 
