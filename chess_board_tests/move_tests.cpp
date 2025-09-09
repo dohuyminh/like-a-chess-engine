@@ -6,6 +6,11 @@
 #include "moves/get_all_moves.h"
 #include "check_terminal/check.h"
 #include "check_terminal/checkmate.h"
+#include "moves/algebraic_notation.h"
+#include "moves/queens_algebraic.h"
+#include "moves/knights_algebraic.h"
+#include "moves/underpromotion_algebraic.h"
+#include "moves/castling_algebraic.h"
 
 using namespace internal;
 
@@ -23,27 +28,47 @@ TEST_F(MoveTest, QueensMoveWhiteRookValid) {
     utility::writeData(boardData, Coord2D('h', 2), ChessPiece::NONE);
     ChessBoard custom(boardData);
 
+    // Ra1a3
     QueensMove move1(Color::WHITE, Direction::UP, 2, Coord2D('a', 1));
     auto result1 = move1(custom);
     EXPECT_TRUE(result1.has_value());
     EXPECT_EQ(result1->getPiece(Coord2D('a', 3)), ChessPiece::WHITE_ROOK);
     EXPECT_FALSE(result1->castling(Color::WHITE, true));
+    // alg notation test
+    QueensAlgebraic algebraic1(move1);
+    MoveResult result1algebraic = algebraic1.performMove(custom);
+    EXPECT_EQ(result1algebraic.notation, "Ra1a3");
 
+    // Rh1xh7
     QueensMove move2(Color::WHITE, Direction::UP, 6, Coord2D('h', 1));
     auto result2 = move2(result1.value());
     EXPECT_TRUE(result2.has_value());
     EXPECT_EQ(result2->getPiece(Coord2D('h', 7)), ChessPiece::WHITE_ROOK);
     EXPECT_FALSE(result2->castling(Color::WHITE, false));
+    // alg notation test
+    QueensAlgebraic algebraic2(move2);
+    MoveResult result2algebraic = algebraic2.performMove(result1.value());
+    EXPECT_EQ(result2algebraic.notation, "Rh1xh7");
 
+    // Ra3e3
     QueensMove move3(Color::WHITE, Direction::RIGHT, 4, Coord2D('a', 3));
     auto result3 = move3(result2.value());
     EXPECT_TRUE(result3.has_value());
     EXPECT_EQ(result3->getPiece(Coord2D('e', 3)), ChessPiece::WHITE_ROOK);
+    // alg notation test
+    QueensAlgebraic algebraic3(move3);
+    MoveResult result3algebraic = algebraic3.performMove(result2.value());
+    EXPECT_EQ(result3algebraic.notation, "Ra3e3");
 
+    // Re3d3
     QueensMove move4(Color::WHITE, Direction::LEFT, 1, Coord2D('e', 3));
     auto result4 = move4(result3.value());
     EXPECT_TRUE(result4.has_value());
     EXPECT_EQ(result4->getPiece(Coord2D('d', 3)), ChessPiece::WHITE_ROOK);
+    // alg notation test
+    QueensAlgebraic algebraic4(move4);
+    MoveResult result4algebraic = algebraic4.performMove(result3.value());
+    EXPECT_EQ(result4algebraic.notation, "Re3d3");
 }
 
 TEST_F(MoveTest, QueensMoveBlackRookValid) {
@@ -53,11 +78,16 @@ TEST_F(MoveTest, QueensMoveBlackRookValid) {
     utility::writeData(boardData, Coord2D('h', 7), ChessPiece::NONE);
     ChessBoard custom(boardData);
     
+    // Ra8a6
     QueensMove move(Color::BLACK, Direction::UP, 2, Coord2D('a', 8));
     auto result = move(custom);
     EXPECT_TRUE(result.has_value());
     EXPECT_EQ(result->getPiece(Coord2D('a', 6)), ChessPiece::BLACK_ROOK);
     EXPECT_FALSE(result->castling(Color::BLACK, false));
+    // alg notation test
+    QueensAlgebraic algebraic(move);
+    MoveResult resultalgebraic = algebraic.performMove(custom);
+    EXPECT_EQ(resultalgebraic.notation, "Ra8a6");
 }
 
 TEST_F(MoveTest, QueensMoveWhiteBishopValid) {
@@ -66,16 +96,27 @@ TEST_F(MoveTest, QueensMoveWhiteBishopValid) {
     utility::writeData(boardData, Coord2D('d', 2), ChessPiece::NONE);
     utility::writeData(boardData, Coord2D('e', 2), ChessPiece::NONE);
     ChessBoard custom(boardData);
+
+    // Bc1d2
     QueensMove move(Color::WHITE, Direction::UP_RIGHT, 1, Coord2D('c', 1));
     auto result = move(custom);
     EXPECT_TRUE(result.has_value());
     EXPECT_EQ(result->getPiece(Coord2D('d', 2)), ChessPiece::WHITE_BISHOP);
+    // alg notation test
+    QueensAlgebraic algebraic(move);
+    MoveResult resultalgebraic = algebraic.performMove(custom);
+    EXPECT_EQ(resultalgebraic.notation, "Bc1d2");
 
+    // Bf1c4
     ChessBoard custom2(boardData);
     QueensMove move2(Color::WHITE, Direction::UP_LEFT, 3, Coord2D('f', 1));
     auto result2 = move2(custom2);
     EXPECT_TRUE(result2.has_value());
     EXPECT_EQ(result2->getPiece(Coord2D('c', 4)), ChessPiece::WHITE_BISHOP);
+    // alg notation test
+    QueensAlgebraic algebraic2(move2);
+    MoveResult result2algebraic = algebraic2.performMove(custom2);
+    EXPECT_EQ(result2algebraic.notation, "Bf1c4");
 }
 
 TEST_F(MoveTest, QueensMoveWhiteQueenCapture) {
@@ -83,10 +124,16 @@ TEST_F(MoveTest, QueensMoveWhiteQueenCapture) {
     std::copy(board.boardData(), board.boardData() + 34, boardData);
     utility::writeData(boardData, Coord2D('d', 2), ChessPiece::BLACK_PAWN);
     ChessBoard custom(boardData);
+
+    // Qd1xd2
     QueensMove move(Color::WHITE, Direction::UP, 1, Coord2D('d', 1));
     auto result = move(custom);
     EXPECT_TRUE(result.has_value());
     EXPECT_EQ(result->getPiece(Coord2D('d', 2)), ChessPiece::WHITE_QUEEN);
+    // alg notation test
+    QueensAlgebraic algebraic(move);
+    MoveResult resultalgebraic = algebraic.performMove(custom);
+    EXPECT_EQ(resultalgebraic.notation, "Qd1xd2");
 }
 
 TEST_F(MoveTest, QueensMoveBlocked) {

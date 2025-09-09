@@ -25,10 +25,9 @@ MoveResult CastlingAlgebraic::performMove(const ChessBoard& board) {
     MateStatus ms = isCheckmate(nextboard.value(), ~_mv.colorOfAppliedPiece());
 
     if (ms == MateStatus::CHECK) {
-        an.push_back('x');
+        an.push_back('+');
     } else if (ms == MateStatus::CHECKMATE) {
-        an.push_back('x');
-        an.push_back('x');
+        an.push_back('#');
     }
 
     // castling automatically means no capture and no pawn move
