@@ -31,7 +31,7 @@ public:
     virtual ~AlgebraicNotation() = default;
 
 protected:
-    virtual MoveResult performMove(const ChessBoard& board);         
+    virtual MoveResult performMove(const ChessBoard& board) = 0;         
 };
 
 }

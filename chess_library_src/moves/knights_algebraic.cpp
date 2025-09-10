@@ -1,5 +1,6 @@
 #include "knights_algebraic.h"
 #include "../check_terminal/checkmate.h"
+#include "get_all_moves.h"
 
 #include <stdexcept>
 
@@ -39,7 +40,8 @@ MoveResult KnightsAlgebraic::performMove(const ChessBoard& board) {
     an.push_back(dest.row() + '0');
 
     // if the move results in checking the opponent's king, note that
-    MateStatus ms = isCheckmate(nextboard.value(), ~_mv.colorOfAppliedPiece());
+    auto opponentMoves = getAllMoves(nextboard.value(), ~_mv.colorOfAppliedPiece());
+    MateStatus ms = isCheckmate(nextboard.value(), ~_mv.colorOfAppliedPiece(), opponentMoves.size());
     if (ms == MateStatus::CHECK) {
         an.push_back('+');
     } else if (ms == MateStatus::CHECKMATE) {

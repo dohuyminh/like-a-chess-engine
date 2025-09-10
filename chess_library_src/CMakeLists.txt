@@ -35,6 +35,14 @@ target_sources(
         ${CMAKE_CURRENT_LIST_DIR}/moves/knights_move.h
         ${CMAKE_CURRENT_LIST_DIR}/moves/knights_move.cpp
         ${CMAKE_CURRENT_LIST_DIR}/moves/algebraic_notation.h
+        ${CMAKE_CURRENT_LIST_DIR}/moves/queens_algebraic.h
+        ${CMAKE_CURRENT_LIST_DIR}/moves/queens_algebraic.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/moves/knights_algebraic.h
+        ${CMAKE_CURRENT_LIST_DIR}/moves/knights_algebraic.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/moves/underpromotion_algebraic.h
+        ${CMAKE_CURRENT_LIST_DIR}/moves/underpromotion_algebraic.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/moves/castling_algebraic.h
+        ${CMAKE_CURRENT_LIST_DIR}/moves/castling_algebraic.cpp
         ${CMAKE_CURRENT_LIST_DIR}/check_terminal/check.h
         ${CMAKE_CURRENT_LIST_DIR}/check_terminal/check.cpp
         ${CMAKE_CURRENT_LIST_DIR}/check_terminal/checkmate.h

@@ -1,5 +1,6 @@
 #include "underpromotion_algebraic.h"
 #include "../check_terminal/checkmate.h"
+#include "get_all_moves.h"
 
 #include <stdexcept>
 
@@ -58,7 +59,8 @@ MoveResult UnderpromotionAlgebraic::performMove(const ChessBoard& board) {
     }
 
     // if the resulting board checks the opponent's king, note that
-    MateStatus ms = isCheckmate(nextboard.value(), ~_mv.colorOfAppliedPiece());
+    auto opponentMoves = getAllMoves(nextboard.value(), ~_mv.colorOfAppliedPiece());
+    MateStatus ms = isCheckmate(nextboard.value(), ~_mv.colorOfAppliedPiece(), opponentMoves.size());
     if (ms == MateStatus::CHECK) {
         an.push_back('+');
     } else if (ms == MateStatus::CHECKMATE) {

@@ -1,5 +1,6 @@
 #include "castling_algebraic.h"
 #include "../check_terminal/checkmate.h"
+#include "get_all_moves.h"
 
 #include <stdexcept>
 
@@ -22,7 +23,8 @@ MoveResult CastlingAlgebraic::performMove(const ChessBoard& board) {
     std::string an = (_mv.moveLeft()) ? "0-0-0" : "0-0"; 
     
     // if the move checks the opponent's king, denote at the end with "x" (check) or "xx" (checkmate)
-    MateStatus ms = isCheckmate(nextboard.value(), ~_mv.colorOfAppliedPiece());
+    auto opponentMoves = getAllMoves(nextboard.value(), ~_mv.colorOfAppliedPiece());
+    MateStatus ms = isCheckmate(nextboard.value(), ~_mv.colorOfAppliedPiece(), opponentMoves.size());
 
     if (ms == MateStatus::CHECK) {
         an.push_back('+');
