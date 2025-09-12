@@ -2,6 +2,7 @@ add_executable(
     unit_tests
     unit_tests.cpp
     board_tests.cpp
+    arena_tests.cpp
     move_tests.cpp
 )
 

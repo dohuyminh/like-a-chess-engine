@@ -9,6 +9,10 @@ target_sources(
         ${CMAKE_CURRENT_LIST_DIR}/coord2D.h
         ${CMAKE_CURRENT_LIST_DIR}/coord2D.cpp 
         ${CMAKE_CURRENT_LIST_DIR}/utility.h
+        ${CMAKE_CURRENT_LIST_DIR}/arena.h 
+        ${CMAKE_CURRENT_LIST_DIR}/arena.cpp
+
+        # square iterator
         ${CMAKE_CURRENT_LIST_DIR}/square_iterator/reachability.h
         ${CMAKE_CURRENT_LIST_DIR}/square_iterator/r_bishop.h
         ${CMAKE_CURRENT_LIST_DIR}/square_iterator/r_bishop.cpp 
@@ -22,6 +26,8 @@ target_sources(
         ${CMAKE_CURRENT_LIST_DIR}/square_iterator/r_rook.cpp 
         ${CMAKE_CURRENT_LIST_DIR}/square_iterator/next_square_iterator.h
         ${CMAKE_CURRENT_LIST_DIR}/square_iterator/next_square_iterator.cpp 
+        
+        # moves
         ${CMAKE_CURRENT_LIST_DIR}/moves/get_all_moves.h
         ${CMAKE_CURRENT_LIST_DIR}/moves/get_all_moves.cpp
         ${CMAKE_CURRENT_LIST_DIR}/moves/chess_move.h
@@ -43,6 +49,12 @@ target_sources(
         ${CMAKE_CURRENT_LIST_DIR}/moves/underpromotion_algebraic.cpp
         ${CMAKE_CURRENT_LIST_DIR}/moves/castling_algebraic.h
         ${CMAKE_CURRENT_LIST_DIR}/moves/castling_algebraic.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/moves/next_board.h
+        ${CMAKE_CURRENT_LIST_DIR}/moves/next_board.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/moves/lru_movegen.h 
+        ${CMAKE_CURRENT_LIST_DIR}/moves/lru_movegen.cpp
+        
+        # check terminal
         ${CMAKE_CURRENT_LIST_DIR}/check_terminal/check.h
         ${CMAKE_CURRENT_LIST_DIR}/check_terminal/check.cpp
         ${CMAKE_CURRENT_LIST_DIR}/check_terminal/checkmate.h
