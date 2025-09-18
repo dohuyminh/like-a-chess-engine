@@ -3,12 +3,15 @@ add_library(chess_library_src "")
 target_sources(
     chess_library_src
     PUBLIC 
+        # root
         ${CMAKE_CURRENT_LIST_DIR}/chess_piece.h
         ${CMAKE_CURRENT_LIST_DIR}/chess_board.h 
         ${CMAKE_CURRENT_LIST_DIR}/chess_board.cpp
         ${CMAKE_CURRENT_LIST_DIR}/coord2D.h
         ${CMAKE_CURRENT_LIST_DIR}/coord2D.cpp 
         ${CMAKE_CURRENT_LIST_DIR}/utility.h
+        ${CMAKE_CURRENT_LIST_DIR}/fen.h 
+        ${CMAKE_CURRENT_LIST_DIR}/fen.cpp
         ${CMAKE_CURRENT_LIST_DIR}/arena.h 
         ${CMAKE_CURRENT_LIST_DIR}/arena.cpp
 

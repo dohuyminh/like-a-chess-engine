@@ -2,7 +2,6 @@
 
 #include "../chess_board.h"
 
-#include <utility>
 #include <string>
 
 struct MoveResult {

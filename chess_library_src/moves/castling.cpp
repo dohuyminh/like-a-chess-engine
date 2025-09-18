@@ -58,7 +58,8 @@ std::optional<ChessBoard> Castling::operator()(const ChessBoard& board) const {
     // get raw board 
     char boardData[34] = { 0 };
     std::copy(board.boardData(), board.boardData() + 34, boardData);
-    
+    utility::turnOffEnpassant(boardData);
+
     // disable castling for the move 
     internal::utility::turnOffCastling(boardData, _color, true);
     internal::utility::turnOffCastling(boardData, _color, false);

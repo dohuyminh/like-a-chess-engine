@@ -80,6 +80,7 @@ std::optional<ChessBoard> Underpromotion::operator()(const ChessBoard& board) co
     // get raw board 
     char boardData[34] = { 0 };
     std::copy(board.boardData(), board.boardData() + 34, boardData);
+    utility::turnOffEnpassant(boardData);
 
     // get direction and new piece position after transformation
     Vec2D dir = vecMap[_direction];

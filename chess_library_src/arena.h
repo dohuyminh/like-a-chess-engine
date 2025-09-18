@@ -2,34 +2,21 @@
 
 #include "chess_board.h"
 #include "moves/chess_move.h"
-#include "moves/get_all_moves.h"
 #include "moves/lru_movegen.h"
+#include "fen.h"
 
 #include <deque>
+#include <unordered_map>
 
 typedef std::shared_ptr< internal::ChessMove > Move;
-
-struct State {
-    const ChessBoard board;
-    bool isTerminal;
-    const Color turn;
-    const Color winner;
-    const std::vector< std::shared_ptr< internal::ChessMove > > possibleMoves;
-    const std::size_t movesWithoutProgress;
-
-    State(
-        const ChessBoard& board, 
-        bool isTerminal, 
-        Color turn, 
-        Color winner, 
-        std::size_t movesWithoutProgress
-    );
-};
 
 class Arena {
 public:
     
     Arena(std::size_t historySize = 1);
+
+    // start with a custom board using FEN notation
+    Arena(std::string fen, std::size_t historySize = 1);
 
     [[nodiscard]] inline Color winner() const {
         return _stateHistory.back().winner;
@@ -65,11 +52,15 @@ public:
 
     bool performMove(const std::shared_ptr< internal::ChessMove >& mv); 
 
-    [[nodiscard]] inline bool rollBack() {
+    inline bool rollBack() {
         // maximum rollback; denied
         if (_stateHistory.size() == 1) {
             return false;
         }
+        
+        // remove the state count for recent board
+        --_boardCount[_stateHistory.back().board];
+
         _stateHistory.pop_back();
         return true;
     }
@@ -79,7 +70,7 @@ public:
         // mark the current state as terminal
         
         // if a game has already ended or the current state occurred less than 3 times 
-        // or the moves withour progress is less than 50, cannot claim draw 
+        // and the moves withour progress is less than 50, cannot claim draw 
         if (_stateHistory.back().winner != Color::NONE || 
             (_stateHistory.back().movesWithoutProgress < 50 && _boardCount[_stateHistory.back().board] < 3)) {
             return false;
@@ -87,6 +78,18 @@ public:
 
         // actually true; time to end the game 
         _stateHistory.back().isTerminal = true;
+        return true;
+    }
+
+    [[nodiscard]] inline bool resign() {
+        // if the game has already ended, cannot resign
+        if (_stateHistory.back().isTerminal) {
+            return false;
+        }
+
+        // current player resigns, opponent wins
+        _stateHistory.back().isTerminal = true;
+        _stateHistory.back().winner     = ~_stateHistory.back().turn;
         return true;
     }
 
@@ -101,7 +104,7 @@ private:
     std::vector< std::string > _logs;  
 
     // keeps track of state
-    std::deque< State > _stateHistory;
+    std::deque< internal::State > _stateHistory;
 
     // for fast access to possible moves for each state
     // an average chess game may end at around 40-60 moves; we can take advantage 

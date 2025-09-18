@@ -1,8 +1,6 @@
 #include "chess_board.h"
+#include "chess_piece.h"
 #include "utility.h"
-
-#include <stdexcept>
-#include <utility>
 
 // #include <pybind11/pybind11.h>
 
@@ -57,9 +55,9 @@ ChessBoard::ChessBoard(const char* boardData) {
 std::string ChessBoard::getWhitePOV() const {
     std::string rep{"  a b c d e f g h\n"};
     
-    for (int8_t row = Coord2D::BOARD_SIZE - 1; row >= 0; --row) {
+    for (int8_t row = Coord2D::BOARD_SIZE; row >= 1; --row) {
         
-        rep.push_back(static_cast<char>('1' + row));
+        rep.push_back(static_cast<char>('0' + row));
         rep.push_back('|');
 
         for (char col = 'a'; col <= 'h'; ++col) {
@@ -69,11 +67,20 @@ std::string ChessBoard::getWhitePOV() const {
             rep.push_back('|');
         } 
         
-        rep.push_back(static_cast<char>('1' + row));
+        rep.push_back(static_cast<char>('0' + row));
         rep.push_back('\n');
     } 
 
     rep.append("  a b c d e f g h\n");
+
+    // get white en passant and castling rights
+    rep += "White en passant: ";
+    rep += enpassant(Color::WHITE).has_value() ? (std::string)enpassant(Color::WHITE).value() : "none";
+    rep.push_back('\n');
+    rep += "White's kingside castling rights: ";
+    rep += castling(Color::WHITE, false) ? "yes\n" : "no\n";
+    rep += "White's queenside castling rights: ";
+    rep += castling(Color::WHITE, true) ? "yes\n" : "no\n";
 
     return rep;
 }
@@ -83,7 +90,7 @@ std::string ChessBoard::getBlackPOV() const {
 
     for (int8_t row = 1; row <= Coord2D::BOARD_SIZE; ++row) {
 
-        rep.push_back(static_cast<char>('1' + row));
+        rep.push_back(static_cast<char>('0' + row));
         rep.push_back('|');
 
         for (char col = 'h'; col >= 'a'; --col) {
@@ -93,11 +100,20 @@ std::string ChessBoard::getBlackPOV() const {
             rep.push_back('|');
         }
 
-        rep.push_back(static_cast<char>('1' + row));
+        rep.push_back(static_cast<char>('0' + row));
         rep.push_back('\n');
     }
 
     rep.append("  h g f e d c b a\n");
+
+    // get white en passant and castling rights
+    rep += "Black en passant: ";
+    rep += enpassant(Color::BLACK).has_value() ? (std::string)enpassant(Color::BLACK).value() : "none";
+    rep.push_back('\n');
+    rep += "Black's kingside castling rights: ";
+    rep += castling(Color::BLACK, false) ? "yes\n" : "no\n";
+    rep += "Black's queenside castling rights: ";
+    rep += castling(Color::BLACK, true) ? "yes\n" : "no\n";
 
     return rep;
 }

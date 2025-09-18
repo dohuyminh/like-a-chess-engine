@@ -74,6 +74,7 @@ std::optional<ChessBoard> KnightsMove::operator()(const ChessBoard& board) const
     // get the raw board
     char boardData[34] = { 0 };
     std::copy(board.boardData(), board.boardData() + 34, boardData);
+    utility::turnOffEnpassant(boardData);
 
     // transform the raw board 
     internal::utility::writeData(boardData, _origin, ChessPiece::NONE);

@@ -1,8 +1,5 @@
 #include <gtest/gtest.h>
-#include <memory>
 #include "arena.h"
-#include "moves/chess_move.h"
-#include "coord2D.h"
 
 using namespace internal;
 
@@ -51,13 +48,12 @@ TEST_F(ArenaTest, PerformValidMove) {
     EXPECT_EQ(arena->movesWithoutProgress(), 0); // Pawn move resets counter
 }
 
-// TODO: Requires setting up a complex checkmate position
 TEST_F(ArenaTest, PerformMoveOnTerminalGameReturnsFalse) {
-    // Create a scenario where game is terminal
-    Arena terminalArena(1);
-    // This would require setting up a checkmate position, which is complex
-    // For now, we'll test the null move case
-    EXPECT_FALSE(terminalArena.performMove(nullptr));
+    // Verified stalemate: Black to move has no legal moves and is not in check
+    // Black king a8; White queen b6; White king c6
+    std::string stalemateFen = "k7/8/1QK5/8/8/8/8/8 b - - 0 1";
+    Arena terminalArena(stalemateFen, 1);
+    EXPECT_TRUE(terminalArena.getAllMoves().empty());
 }
 
 TEST_F(ArenaTest, PerformNullMoveThrows) {
@@ -80,17 +76,16 @@ TEST_F(ArenaTest, ClaimDrawWithInsufficientRepetition) {
     EXPECT_FALSE(arena->claimDraw()); // Only 1 occurrence, not 3
 }
 
-// TODO: Requires setting up 50+ moves without progress (no captures/pawn moves)
 TEST_F(ArenaTest, ClaimDrawWithInsufficientMovesWithoutProgress) {
-    // Would need to set up 50+ moves without progress
-    EXPECT_FALSE(arena->claimDraw()); // Less than 50 moves
+    // Fresh arena: mwp==0 and occurrence(initial)==1, cannot claim draw
+    EXPECT_FALSE(arena->claimDraw());
 }
 
-// TODO: Requires setting up a terminal game state (checkmate/stalemate)
 TEST_F(ArenaTest, ClaimDrawWhenGameAlreadyEnded) {
-    // This would require setting up a terminal state
-    // For now, test that claimDraw returns false for ongoing game
-    EXPECT_FALSE(arena->claimDraw());
+    std::string stalemateFen = "k7/8/1QK5/8/8/8/8/8 b - - 0 1";
+    Arena terminalArena(stalemateFen, 1);
+    // Game has ended by stalemate — draw claim should be rejected
+    EXPECT_FALSE(terminalArena.claimDraw());
 }
 
 // Rollback and History Management Tests
@@ -100,15 +95,15 @@ TEST_F(ArenaTest, RollbackFromInitialStateReturnsFalse) {
 }
 
 TEST_F(ArenaTest, RollbackAfterMove) {
-    auto moves = arena->getAllMoves();
+    auto moves = arenaWithHistory->getAllMoves();
     ASSERT_FALSE(moves.empty());
     
-    Color originalTurn = arena->turn();
-    arena->performMove(moves[0]);
-    EXPECT_NE(arena->turn(), originalTurn);
+    Color originalTurn = arenaWithHistory->turn();
+    arenaWithHistory->performMove(moves[0]);
+    EXPECT_NE(arenaWithHistory->turn(), originalTurn);
     
-    EXPECT_TRUE(arena->rollBack());
-    EXPECT_EQ(arena->turn(), originalTurn);
+    EXPECT_TRUE(arenaWithHistory->rollBack());
+    EXPECT_EQ(arenaWithHistory->turn(), originalTurn);
 }
 
 TEST_F(ArenaTest, HistorySizeLimit) {
@@ -138,7 +133,8 @@ TEST_F(ArenaTest, BoardOccurrenceCounting) {
     if (!moves.empty()) {
         arena->performMove(moves[0]);
         arena->rollBack();
-        EXPECT_EQ(arena->occurrence(initialBoard), 2);
+        // Rollback should not count as a new occurrence in play history
+        EXPECT_EQ(arena->occurrence(initialBoard), 1);
     }
 }
 
@@ -151,13 +147,11 @@ TEST_F(ArenaTest, MovesWithoutProgressCounter) {
     }
 }
 
-// Edge Cases and Error Handling Tests
-// TODO: Requires setting up a terminal position (checkmate/stalemate)
 TEST_F(ArenaTest, GetAllMovesOnTerminalGame) {
-    // This would require setting up a terminal position
-    // For now, test that getAllMoves works on initial position
-    auto moves = arena->getAllMoves();
-    EXPECT_GT(moves.size(), 0);
+    std::string stalemateFen = "k7/8/1QK5/8/8/8/8/8 b - - 0 1";
+    Arena terminalArena(stalemateFen, 1);
+    auto moves = terminalArena.getAllMoves();
+    EXPECT_EQ(moves.size(), 0u);
 }
 
 TEST_F(ArenaTest, MultipleArenaInstancesIndependent) {
@@ -182,23 +176,23 @@ TEST_F(ArenaTest, LargeHistorySize) {
 }
 
 TEST_F(ArenaTest, StateConsistencyAfterOperations) {
-    ChessBoard initialBoard = arena->currentBoard();
-    Color initialTurn = arena->turn();
-    Color initialWinner = arena->winner();
-    size_t initialMovesWithoutProgress = arena->movesWithoutProgress();
+    ChessBoard initialBoard = arenaWithHistory->currentBoard();
+    Color initialTurn = arenaWithHistory->turn();
+    Color initialWinner = arenaWithHistory->winner();
+    size_t initialMovesWithoutProgress = arenaWithHistory->movesWithoutProgress();
     
     // Perform some operations
-    auto moves = arena->getAllMoves();
+    auto moves = arenaWithHistory->getAllMoves();
     if (!moves.empty()) {
-        arena->performMove(moves[0]);
-        arena->rollBack();
+        arenaWithHistory->performMove(moves[0]);
+        arenaWithHistory->rollBack();
     }
     
     // State should be consistent
-    EXPECT_EQ(arena->currentBoard(), initialBoard);
-    EXPECT_EQ(arena->turn(), initialTurn);
-    EXPECT_EQ(arena->winner(), initialWinner);
-    EXPECT_EQ(arena->movesWithoutProgress(), initialMovesWithoutProgress);
+    EXPECT_EQ(arenaWithHistory->currentBoard(), initialBoard);
+    EXPECT_EQ(arenaWithHistory->turn(), initialTurn);
+    EXPECT_EQ(arenaWithHistory->winner(), initialWinner);
+    EXPECT_EQ(arenaWithHistory->movesWithoutProgress(), initialMovesWithoutProgress);
 }
 
 TEST_F(ArenaTest, LogsArePreservedAfterRollback) {
@@ -227,3 +221,4 @@ TEST_F(ArenaTest, BoardCountConsistency) {
         EXPECT_EQ(arena->occurrence(initialBoard), 1);
     }
 }
+

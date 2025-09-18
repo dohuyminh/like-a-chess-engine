@@ -61,6 +61,9 @@ std::optional<ChessBoard> QueensMove::operator()(const ChessBoard& board) const 
     char boardData[34] = { 0 };
     std::copy(board.boardData(), board.boardData() + 34, boardData);
 
+    // by default, there is no en passant; can only modify if the pawn makes a 2-square move 
+    utility::turnOffEnpassant(boardData);
+
     // get the move transformation and the destination square
     Vec2D singleMv = vecMap[_direction] * (_color == Color::WHITE ? 1 : -1), mv = singleMv * _numSteps;
     Coord2D dest = _origin + mv;

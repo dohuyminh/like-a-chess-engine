@@ -9,10 +9,6 @@
 #include <functional>
 #include <string>
 #include <optional>
-#include <unordered_set>
-#include <vector>
-
-#include <iostream>
 
 /**
  * @brief A representation of the current chess board state. 

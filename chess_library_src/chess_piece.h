@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstdint>
+
 typedef uint8_t Piece_t;
 
 #include <stdexcept>
@@ -54,7 +56,7 @@ public:
     }
 
     [[nodiscard]] inline const char* toAscii() const {
-        return PieceToAscii[_piece - 1];
+        return PieceToAscii[_piece];
     }
 
     [[nodiscard]] inline bool isNone() const {

@@ -4,6 +4,8 @@ add_executable(
     board_tests.cpp
     arena_tests.cpp
     move_tests.cpp
+    fen_tests.cpp
+    match_tests.cpp
 )
 
 target_include_directories(

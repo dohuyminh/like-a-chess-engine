@@ -1,18 +1,11 @@
 #include "arena.h"
+#include "fen.h"
 #include "moves/next_board.h"
-#include "check_terminal/checkmate.h"
 
 #include <stdexcept>
+#include <cctype>
 
 using namespace internal;
-
-State::State(
-    const ChessBoard& board, 
-    bool isTerminal, 
-    Color turn, 
-    Color winner, 
-    std::size_t movesWithoutProgress
-) : board(board), isTerminal(isTerminal), turn(turn), winner(winner), movesWithoutProgress(movesWithoutProgress) {}
 
 Arena::Arena(std::size_t historySize) : 
     _historySize(historySize)
@@ -22,19 +15,23 @@ Arena::Arena(std::size_t historySize) :
     }
 
     // initialize board state
-    _stateHistory.push_back({
-        ChessBoard(), 
-        false, 
-        Color::WHITE, 
-        Color::NONE, 
-        0
-    });
+    _stateHistory.push_back(State(ChessBoard(), Color::WHITE, 0, _generator));
 
-    // initialize board count
     _boardCount[_stateHistory.back().board] = 1;
+}
 
-    // initialize cache
-    _generator.get(_stateHistory.back().board, _stateHistory.back().turn);
+Arena::Arena(std::string fen, std::size_t historySize) :
+    _historySize(historySize) 
+{
+    if (historySize == 0) {
+        throw std::invalid_argument("History size must be at least 1");
+    }
+
+    // initialize board state 
+    _stateHistory.push_back(internal::loadStateFromFen(fen, _generator));
+    
+    // init board count
+    _boardCount[_stateHistory.back().board] = 1;
 }
 
 bool Arena::performMove(const std::shared_ptr< internal::ChessMove >& mv) {
@@ -51,45 +48,23 @@ bool Arena::performMove(const std::shared_ptr< internal::ChessMove >& mv) {
     // get next board
     MoveResult result = internal::nextBoard(_stateHistory.back().board, mv);
 
-    // update board count
+    // update board count and moves without progress
     _boardCount[result.nextBoard]++;
+    std::size_t mwp = (result.pawnMoved || result.capture) ? 0 : _stateHistory.back().movesWithoutProgress + 1;
 
     // update move logs
     _logs.push_back(result.notation);
 
-    // update state history
     Color nextTurn = ~_stateHistory.back().turn;
-    std::size_t nextMovesWithoutProgress = result.capture || result.pawnMoved ? 0 : _stateHistory.back().movesWithoutProgress + 1;
-    const std::vector< std::shared_ptr< internal::ChessMove > >& nextPossibleMoves = _generator.get(result.nextBoard, nextTurn);
-
-    // check if the next state is terminal
-    CheckTerminal::MateStatus ms = CheckTerminal::isCheckmate(result.nextBoard, nextTurn, nextPossibleMoves.size());    
-
-    bool isTerminal = false;
-    Color winner = Color::NONE;
-
-    // checkmate opponent
-    if (ms == CheckTerminal::MateStatus::CHECKMATE) {
-        isTerminal = true;
-        winner = _stateHistory.back().turn;
-    }
-
-    // stalemate 
-    else if (nextPossibleMoves.empty()) {
-        isTerminal = true;
-    }
-
-    // by FIDE law, if 5-fold repetition occurs or 75 moves elapsed without progress, 
-    // it's an automatic draw
-    else if (_boardCount[result.nextBoard] == 5 || nextMovesWithoutProgress == 75) {
-        isTerminal = true;
-    } 
-    
-    // TODO: Dead position occurrs when neither player has a sequence of moves 
-    // resulting in the opponent's king getting checked 
 
     // add new state to history
-    _stateHistory.push_back({ result.nextBoard, isTerminal, nextTurn, winner, nextMovesWithoutProgress });
+    _stateHistory.push_back(State(result.nextBoard, nextTurn, mwp, _generator));
+
+    // by FIDE, 5-fold repetition would mean automatic draw
+    if (_boardCount[result.nextBoard] >= 5) {
+        _stateHistory.back().isTerminal = true;
+        _stateHistory.back().winner     = Color::NONE;
+    }
 
     // if the history exceeds capacity, delete least recent 
     if (_stateHistory.size() > _historySize) {
