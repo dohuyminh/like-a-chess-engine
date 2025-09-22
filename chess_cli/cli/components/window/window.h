@@ -11,7 +11,7 @@ class Page;
 class Window {
 public:
 
-    Window(Page& page, int activateKey, int ty, int tx, int height, int width);
+    Window(std::shared_ptr< Page > page, int activateKey, int ty, int tx, int height, int width);
 
     inline int activateKey() const noexcept {
         return _activateKey;

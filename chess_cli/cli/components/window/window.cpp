@@ -1,6 +1,6 @@
 #include "window.h"
 
-Window::Window(Page& page, int activateKey, int ty, int tx, int height, int width) :
+Window::Window(std::shared_ptr< Page > page, int activateKey, int ty, int tx, int height, int width) :
     _page(page), _ty(ty), _tx(tx), _height(height), _width(width) 
 {
 
