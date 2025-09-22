@@ -1,0 +1,40 @@
+<mxfile host="65bd71144e">
+    <diagram id="GMPAz1i96b_Erl_cn8wg" name="Page-1">
+        <mxGraphModel dx="549" dy="454" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="20" value="owns" style="edgeStyle=none;html=1;" edge="1" parent="1" source="16" target="17">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="24" value="gets current page index to render" style="edgeStyle=none;html=1;" edge="1" parent="1" source="16" target="23">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="16" value="Application" style="html=1;whiteSpace=wrap;" vertex="1" parent="1">
+                    <mxGeometry x="330" y="500" width="110" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="21" value="contains" style="edgeStyle=none;html=1;" edge="1" parent="1" source="17" target="18">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="17" value="Resources" style="html=1;whiteSpace=wrap;" vertex="1" parent="1">
+                    <mxGeometry x="520" y="550" width="110" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="22" value="contains" style="edgeStyle=none;html=1;" edge="1" parent="1" source="18" target="19">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="18" value="Page" style="html=1;whiteSpace=wrap;" vertex="1" parent="1">
+                    <mxGeometry x="520" y="670" width="110" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="25" value="updates on&lt;div&gt;command&lt;/div&gt;" style="edgeStyle=none;html=1;" edge="1" parent="1" source="19" target="23">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="19" value="Window" style="html=1;whiteSpace=wrap;" vertex="1" parent="1">
+                    <mxGeometry x="520" y="800" width="110" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="23" value="PCB" style="html=1;whiteSpace=wrap;" vertex="1" parent="1">
+                    <mxGeometry x="330" y="750" width="110" height="50" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>

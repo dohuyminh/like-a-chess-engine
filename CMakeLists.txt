@@ -6,18 +6,14 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 cmake_policy(SET CMP0135 NEW)
 
-enable_testing()
-
-include(FetchContent)
-
-FetchContent_Declare(
-    googletest
-    URL https://github.com/google/googletest/archive/03597a01ee50ed33e9dfd640b249b4be3799d395.zip
-)
-FetchContent_MakeAvailable(googletest)
-
-find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
-
-add_subdirectory(pybind11)
 add_subdirectory(chess_library_src)
-add_subdirectory(chess_board_tests)
+
+set(Mode "" CACHE STRING "Choose what to build: CLI (cli) chess loading, unit tests (tests) or Python library (python)")
+
+if (Mode STREQUAL "cli")
+    add_subdirectory(chess_cli)
+elseif (Mode STREQUAL "tests")
+    add_subdirectory(chess_board_tests)
+else ()
+    message(WARNING "No valid -DMode option provided (use 'cli', 'tests', or 'python')")
+endif()

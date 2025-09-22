@@ -1,3 +1,13 @@
+enable_testing()
+
+include(FetchContent)
+
+FetchContent_Declare(
+    googletest
+    URL https://github.com/google/googletest/archive/03597a01ee50ed33e9dfd640b249b4be3799d395.zip
+)
+FetchContent_MakeAvailable(googletest)
+
 add_executable(
     unit_tests
     unit_tests.cpp
@@ -6,12 +16,6 @@ add_executable(
     move_tests.cpp
     fen_tests.cpp
     match_tests.cpp
-)
-
-target_include_directories(
-    unit_tests
-    PRIVATE
-        ${CMAKE_SOURCE_DIR}/chess_board
 )
 
 target_link_libraries(

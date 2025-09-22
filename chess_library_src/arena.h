@@ -93,6 +93,10 @@ public:
         return true;
     }
 
+    [[nodiscard]] inline bool gameHasEnded() const {
+        return _stateHistory.back().isTerminal;
+    }
+
 private:
     
     std::size_t _historySize;
