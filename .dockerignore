@@ -1,0 +1,11 @@
+.idea
+.venv
+.vscode
+__pycache__
+cli_build
+tests_run
+cmake-build-debug
+docs 
+pybind11
+README.md
+LICENSE
