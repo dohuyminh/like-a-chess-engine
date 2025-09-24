@@ -1,6 +1,10 @@
 .idea
 .venv
 .vscode
+.git
+.gitignore
+.gitmodules
+model.ipynb
 __pycache__
 cli_build
 tests_run

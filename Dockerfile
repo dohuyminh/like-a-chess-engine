@@ -1,24 +1,13 @@
 # Use a base image with C++ build tools
 FROM ubuntu:22.04
 
-# Install dependencies and newer cmake
+# Install dependencies
 RUN apt-get update && apt-get install -y \
     build-essential \
-    wget \
-    gdb \
+    cmake \
     && rm -rf /var/lib/apt/lists/*
 
-# Install newer version of CMake
-RUN wget https://github.com/Kitware/CMake/releases/download/v3.27.7/cmake-3.27.7-linux-x86_64.sh \
-    -q -O /tmp/cmake-install.sh \
-    && chmod u+x /tmp/cmake-install.sh \
-    && mkdir -p /opt/cmake \
-    && /tmp/cmake-install.sh --skip-license --prefix=/opt/cmake \
-    && ln -s /opt/cmake/bin/cmake /usr/local/bin/cmake \
-    && ln -s /opt/cmake/bin/ctest /usr/local/bin/ctest \
-    && rm /tmp/cmake-install.sh
-
-# Set working directory
+# Set working directoryd
 WORKDIR /chess-engine
 
 # Copy the entire project
