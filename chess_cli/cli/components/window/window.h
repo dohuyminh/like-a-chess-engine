@@ -7,6 +7,7 @@
 #include <unordered_map>
 
 class Page;
+class PageControlBlock;
 
 class Window {
 public:
@@ -24,7 +25,16 @@ public:
             return false;
         }
 
-        _window = newwin(_height, _width, _ty, _tx);
+        // if this is not root window
+        if (_activateKey != 27) {
+            _window = newwin(_height, _width, _ty, _tx);
+            keypad(_window, TRUE);
+            nodelay(_window, TRUE);
+        }
+        else {
+            _window = stdscr;
+            keypad(_window, TRUE);
+        }
         return true;
     }
 
@@ -35,9 +45,18 @@ public:
             return false;
         }
 
+        if (_activateKey == 27) {
+            // root window - do not delete stdscr
+            _window = nullptr;
+            return true;
+        }
         delwin(_window);
         _window = nullptr;
         return true;
+    }
+
+    inline bool isInitialized() const noexcept {
+        return _window != nullptr;
     }
 
     inline std::optional< int > getInput() const {
@@ -46,14 +65,16 @@ public:
             throw std::runtime_error("Window; window is not initialzied before reading input");
         }
         int ch = wgetch(_window);
-        return ch == ERR ? std::optional< int >(ch) : std::nullopt;
+        return ch == ERR ? std::nullopt : std::optional< int >(ch);
     }
 
     virtual void render() const = 0;
 
     void update();
 
-    virtual void sendUpdateToPage(int input);
+    virtual void sendUpdateToPage(int input) = 0;
+
+    virtual ~Window();
 
 protected:
 
@@ -63,14 +84,19 @@ protected:
 
     WINDOW* _window = nullptr;    
 
-    std::shared_ptr< Page > _page;
+    std::shared_ptr<Page> _page;
 
 };
 
 class Page {
 public:
 
-    Page() = default;    
+    Page(std::size_t pageIdx, std::shared_ptr<PageControlBlock> pcb);    
+    virtual ~Page();
+
+    inline std::size_t pageIdx() const noexcept {
+        return _pageIdx;
+    }
 
     inline bool addWindow(std::unique_ptr<Window> win) noexcept {
         if (_windows.count(win->activateKey())) {
@@ -88,12 +114,26 @@ public:
         return true;    
     }
 
+    void initWindows() noexcept;
+
+    bool isInitialized() const noexcept;
+
     virtual void render() = 0;    
 
-    virtual void update() = 0;
+    void update(int currentWindow);
+
+    virtual void performUpdate() = 0;
+
+    void signalAppStop() noexcept;
+
+    void clean() noexcept;
 
 protected: 
 
+    std::size_t _pageIdx;
+
     std::unordered_map< int, std::unique_ptr<Window> > _windows;
 
+    std::shared_ptr< PageControlBlock > _pcb;
 };
+

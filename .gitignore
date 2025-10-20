@@ -3,6 +3,6 @@
 .vscode
 .cache
 cmake-build-debug
-tests_run
-cli_build
+build_tests
+build_cli
 **/.DS_Store

@@ -25,6 +25,20 @@ public:
         return _color == WHITE ? BLACK : WHITE; 
     } 
 
+    inline operator std::string() const noexcept {
+        switch (_color)
+        {
+        case WHITE:
+            return "White";
+            
+        case BLACK:
+            return "Black";
+        
+        default:
+            return "None";
+        }
+    };
+
 private:
     
     _Color _color;
